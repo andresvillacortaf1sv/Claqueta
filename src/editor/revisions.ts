@@ -6,7 +6,7 @@
  * El estado (activo + revisión actual) vive en el propio plugin y se actualiza
  * desde React con `setRevisionMeta`.
  */
-import { Plugin, PluginKey, EditorState, Transaction } from "prosemirror-state";
+import { Plugin, PluginKey, EditorState, Transaction, Command } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 
 export interface RevisionState {
@@ -52,6 +52,34 @@ export function revisionsPlugin(): Plugin<RevisionState> {
 /** Actualiza el estado del modo revisión desde la interfaz. */
 export function setRevisionMeta(view: EditorView, patch: Partial<RevisionState>): void {
   view.dispatch(view.state.tr.setMeta(revisionKey, patch));
+}
+
+/**
+ * Marca con la revisión dada todos los bloques que toca la selección actual
+ * (o el bloque del cursor si no hay selección). Es lo que hace que elegir un
+ * color aplique el sombreado al texto seleccionado al instante.
+ */
+export function applyRevision(revId: string): Command {
+  return (state, dispatch) => {
+    const { from, to } = state.selection;
+    let tr = state.tr;
+    let changed = false;
+    state.doc.nodesBetween(from, to, (node, pos) => {
+      if (node.isTextblock) {
+        if (node.attrs.revision !== revId) {
+          tr = tr.setNodeMarkup(pos, undefined, { ...node.attrs, revision: revId });
+          changed = true;
+        }
+        return false;
+      }
+      return true;
+    });
+    if (changed && dispatch) {
+      tr.setMeta(revisionKey, {});
+      dispatch(tr);
+    }
+    return changed;
+  };
 }
 
 /** Quita todas las marcas de revisión del documento. */

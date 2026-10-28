@@ -76,7 +76,7 @@ export function Preview({ blocks, titlePage, onClose }: Props) {
                     key={i}
                     style={
                       l.revision
-                        ? { backgroundColor: (revisionById(l.revision)?.hex ?? "#b1223b") + "2e" }
+                        ? { backgroundColor: (revisionById(l.revision)?.hex ?? "#b1223b") + "45" }
                         : undefined
                     }
                   >

@@ -37,7 +37,7 @@ export const schema = new Schema({
     doc: { content: "block+" },
 
     scene_heading: block("sp-scene-heading", {
-      attrs: { sceneNumber: { default: null } },
+      attrs: { sceneNumber: { default: null }, summary: { default: "" } },
       defining: true,
     }),
     action: block("sp-action", {

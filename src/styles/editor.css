@@ -76,21 +76,19 @@
   margin-bottom: 1em;
 }
 
-/* Sombreado de revisión: el bloque editado queda resaltado en su color.
-   box-decoration-break hace que el sombreado cubra bien las líneas envueltas. */
+/* Sombreado de revisión: el bloque marcado se resalta en su color, con una
+   barra sólida a la izquierda (inset box-shadow, no desplaza el texto). */
 .sp-el[data-rev] {
   border-radius: 2px;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
 }
-.sp-el[data-rev="blue"] { background: rgba(45, 108, 223, 0.18); }
-.sp-el[data-rev="pink"] { background: rgba(224, 90, 160, 0.18); }
-.sp-el[data-rev="yellow"] { background: rgba(201, 162, 26, 0.22); }
-.sp-el[data-rev="green"] { background: rgba(46, 158, 91, 0.18); }
-.sp-el[data-rev="goldenrod"] { background: rgba(184, 134, 11, 0.20); }
-.sp-el[data-rev="buff"] { background: rgba(156, 132, 87, 0.22); }
-.sp-el[data-rev="salmon"] { background: rgba(232, 121, 90, 0.20); }
-.sp-el[data-rev="cherry"] { background: rgba(177, 34, 59, 0.16); }
+.sp-el[data-rev="blue"]      { background: rgba(45, 108, 223, 0.28);  box-shadow: inset 3px 0 0 #2d6cdf; }
+.sp-el[data-rev="pink"]      { background: rgba(224, 90, 160, 0.28);  box-shadow: inset 3px 0 0 #e05aa0; }
+.sp-el[data-rev="yellow"]    { background: rgba(201, 162, 26, 0.32);  box-shadow: inset 3px 0 0 #c9a21a; }
+.sp-el[data-rev="green"]     { background: rgba(46, 158, 91, 0.28);   box-shadow: inset 3px 0 0 #2e9e5b; }
+.sp-el[data-rev="goldenrod"] { background: rgba(184, 134, 11, 0.30);  box-shadow: inset 3px 0 0 #b8860b; }
+.sp-el[data-rev="buff"]      { background: rgba(156, 132, 87, 0.32);  box-shadow: inset 3px 0 0 #9c8457; }
+.sp-el[data-rev="salmon"]    { background: rgba(232, 121, 90, 0.30);  box-shadow: inset 3px 0 0 #e8795a; }
+.sp-el[data-rev="cherry"]    { background: rgba(177, 34, 59, 0.26);   box-shadow: inset 3px 0 0 #b1223b; }
 
 /* Marcador de salto de página (alto 0: no desplaza el texto) */
 .pm-pagebreak {

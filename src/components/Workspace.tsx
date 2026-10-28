@@ -8,7 +8,7 @@ import { schema } from "../editor/schema";
 import { screenplayKeymap, baseKeymapPlugin } from "../editor/keymap";
 import { screenplayInputRules } from "../editor/inputrules";
 import { paginationPlugin } from "../editor/pagination";
-import { revisionsPlugin, setRevisionMeta, clearRevisions } from "../editor/revisions";
+import { revisionsPlugin, setRevisionMeta, clearRevisions, applyRevision } from "../editor/revisions";
 import { cargarDocumento, guardarDocumento, docFromBlocks } from "../editor/document";
 import { setElement } from "../editor/commands";
 import { downloadText, pickTextFile } from "../lib/files";
@@ -17,6 +17,10 @@ import { blocksToFountain, fountainToBlocks } from "../lib/fountain";
 import { REVISIONS } from "../lib/revisions";
 import { TitlePage, loadTitlePage, saveTitlePage } from "../lib/titlepage";
 import { TitlePageModal } from "./TitlePageModal";
+import { getScenes, Scene } from "../lib/scenes";
+import { jumpToScene, setSceneSummary, reorderScenes } from "../editor/sceneOps";
+import { SceneNavigator } from "./SceneNavigator";
+import { BeatBoard } from "./BeatBoard";
 import {
   ElementType,
   ELEMENT_LABELS,
@@ -56,6 +60,9 @@ export function Workspace() {
     underline: false,
     strikethrough: false,
   });
+  const [scenes, setScenes] = useState<Scene[]>([]);
+  const [showNav, setShowNav] = useState(false);
+  const [showBeat, setShowBeat] = useState(false);
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -89,6 +96,7 @@ export function Workspace() {
         });
 
         if (tr.docChanged) {
+          setScenes(getScenes(next.doc));
           setSave("guardando");
           if (saveTimer.current) window.clearTimeout(saveTimer.current);
           saveTimer.current = window.setTimeout(() => {
@@ -100,6 +108,7 @@ export function Workspace() {
     });
 
     viewRef.current = view;
+    setScenes(getScenes(view.state.doc));
     view.focus();
 
     return () => {
@@ -165,6 +174,8 @@ export function Workspace() {
     setRevEnabled(true);
     setRevId(id);
     setRevisionMeta(view, { enabled: true, revId: id });
+    // Marca de inmediato lo que esté seleccionado (o el bloque del cursor).
+    applyRevision(id)(view.state, view.dispatch);
     view.focus();
   }, []);
 
@@ -213,6 +224,21 @@ export function Workspace() {
     }
   }, []);
 
+  const goToScene = useCallback((pos: number) => {
+    const view = viewRef.current;
+    if (view) jumpToScene(view, pos);
+  }, []);
+
+  const editSceneSummary = useCallback((pos: number, text: string) => {
+    const view = viewRef.current;
+    if (view) setSceneSummary(view, pos, text);
+  }, []);
+
+  const moveScene = useCallback((from: number, to: number) => {
+    const view = viewRef.current;
+    if (view) reorderScenes(view, from, to);
+  }, []);
+
   // Atajos tipo Final Draft: Ctrl/Cmd + número para fijar el elemento.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -247,11 +273,19 @@ export function Workspace() {
         onPickRevision={pickRevision}
         onDisableRevision={disableRevision}
         onClearRevisions={clearAllRevisions}
+        navOpen={showNav}
+        onToggleNav={() => setShowNav((v) => !v)}
+        onBeatBoard={() => setShowBeat(true)}
       />
 
-      <div className="page-scroll">
-        <div className="page">
-          <div className="pm-mount" ref={mountRef} />
+      <div className="editor-area">
+        {showNav && (
+          <SceneNavigator scenes={scenes} onJump={goToScene} onClose={() => setShowNav(false)} />
+        )}
+        <div className="page-scroll">
+          <div className="page">
+            <div className="pm-mount" ref={mountRef} />
+          </div>
         </div>
       </div>
 
@@ -276,6 +310,16 @@ export function Workspace() {
           initial={titlePage}
           onSave={saveTitle}
           onClose={() => setShowTitleModal(false)}
+        />
+      )}
+
+      {showBeat && (
+        <BeatBoard
+          scenes={scenes}
+          onReorder={moveScene}
+          onEditSummary={editSceneSummary}
+          onJump={goToScene}
+          onClose={() => setShowBeat(false)}
         />
       )}
     </div>

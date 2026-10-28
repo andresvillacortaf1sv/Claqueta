@@ -27,7 +27,7 @@ function hexToRgb(hex: string): [number, number, number] {
 }
 
 /** Aclara un color hacia el blanco para usarlo como sombreado de revisión. */
-function lighten(hex: string, t = 0.8): [number, number, number] {
+function lighten(hex: string, t = 0.7): [number, number, number] {
   const [r, g, b] = hexToRgb(hex);
   const mix = (c: number) => Math.round(c * (1 - t) + 255 * t);
   return [mix(r), mix(g), mix(b)];

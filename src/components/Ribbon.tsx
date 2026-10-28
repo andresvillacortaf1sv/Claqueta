@@ -30,6 +30,9 @@ interface Props {
   onPickRevision: (id: string) => void;
   onDisableRevision: () => void;
   onClearRevisions: () => void;
+  navOpen: boolean;
+  onToggleNav: () => void;
+  onBeatBoard: () => void;
 }
 
 function Group({ label, children }: { label: string; children: ReactNode }) {
@@ -125,6 +128,19 @@ export function Ribbon(props: Props) {
                 title="Tachado (Ctrl/Cmd+Shift+S)"
               >
                 <s>T</s>
+              </button>
+            </Group>
+
+            <Group label="Esquema">
+              <button
+                className={"rb-btn" + (props.navOpen ? " is-on" : "")}
+                onClick={props.onToggleNav}
+                title="Navegador de escenas"
+              >
+                Escenas
+              </button>
+              <button className="rb-btn" onClick={props.onBeatBoard} title="Escaleta de tarjetas">
+                Escaleta
               </button>
             </Group>
 
