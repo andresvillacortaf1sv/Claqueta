@@ -1,0 +1,1 @@
+{"root":["./src/App.tsx","./src/main.tsx","./src/components/StatusBar.tsx","./src/components/Toolbar.tsx","./src/components/Workspace.tsx","./src/editor/commands.ts","./src/editor/document.ts","./src/editor/elements.ts","./src/editor/inputrules.ts","./src/editor/keymap.ts","./src/editor/schema.ts"],"version":"5.9.3"}

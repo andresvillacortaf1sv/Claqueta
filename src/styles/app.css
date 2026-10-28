@@ -1,0 +1,223 @@
+:root {
+  --desk: #2a2927;
+  --desk-2: #222120;
+  --bar: #1b1a18;
+  --bar-line: #34322e;
+  --ink: #ece8e0;
+  --muted: #9a938a;
+  --muted-dim: #6f6960;
+  --paper: #fbfaf7;
+  --paper-ink: #17171a;
+  --accent: #c8803a;
+  --accent-soft: rgba(200, 128, 58, 0.16);
+  --ok: #7fae6b;
+
+  --ui-font: "Inter", system-ui, -apple-system, sans-serif;
+  --script-font: "Courier Prime", "Courier New", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--ui-font);
+  color: var(--ink);
+  background: var(--desk-2);
+  -webkit-font-smoothing: antialiased;
+}
+
+.workspace {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 100vh;
+}
+
+/* ---------- Barra de herramientas ---------- */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0.55rem 1rem;
+  background: var(--bar);
+  border-bottom: 1px solid var(--bar-line);
+}
+
+.toolbar-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.toolbar-logo {
+  color: var(--accent);
+  font-size: 0.9rem;
+}
+
+.toolbar-title {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.toolbar-sub {
+  color: var(--muted-dim);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.toolbar-elements {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-left: auto;
+}
+
+.el-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.32rem 0.6rem;
+  font-family: var(--ui-font);
+  font-size: 0.78rem;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+
+.el-btn:hover {
+  color: var(--ink);
+  background: #2c2a27;
+}
+
+.el-btn.is-active {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: rgba(200, 128, 58, 0.35);
+}
+
+.el-btn-num {
+  font-size: 0.62rem;
+  color: var(--muted-dim);
+  border: 1px solid var(--bar-line);
+  border-radius: 3px;
+  padding: 0 0.28rem;
+  line-height: 1.5;
+}
+
+.el-btn.is-active .el-btn-num {
+  color: var(--accent);
+  border-color: rgba(200, 128, 58, 0.4);
+}
+
+/* ---------- Zona de la página ---------- */
+.page-scroll {
+  overflow: auto;
+  padding: 2.2rem 1rem 4rem;
+  background:
+    radial-gradient(1200px 500px at 50% -10%, #323029 0%, transparent 60%),
+    var(--desk);
+  display: flex;
+  justify-content: center;
+}
+
+.page {
+  width: 8.5in;
+  min-height: 11in;
+  background: var(--paper);
+  color: var(--paper-ink);
+  border-radius: 2px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04),
+    0 18px 50px rgba(0, 0, 0, 0.45);
+  padding: 1in 1in 1in 1.5in;
+}
+
+.pm-mount {
+  height: 100%;
+}
+
+/* ---------- Barra de estado ---------- */
+.statusbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.4rem 1rem;
+  background: var(--bar);
+  border-top: 1px solid var(--bar-line);
+  font-size: 0.78rem;
+}
+
+.status-left {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+.status-chip {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid rgba(200, 128, 58, 0.3);
+  border-radius: 5px;
+  padding: 0.12rem 0.5rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.status-hint {
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.status-keys kbd {
+  font-family: var(--ui-font);
+  font-size: 0.7rem;
+  color: var(--ink);
+  background: #2c2a27;
+  border: 1px solid var(--bar-line);
+  border-radius: 4px;
+  padding: 0.02rem 0.32rem;
+}
+
+.status-save {
+  color: var(--muted-dim);
+}
+
+.status-save.guardado {
+  color: var(--ok);
+}
+
+@media (max-width: 920px) {
+  .page {
+    width: 100%;
+    min-width: 0;
+    padding: 0.7in 0.6in 0.7in 0.8in;
+  }
+  .toolbar-sub {
+    display: none;
+  }
+}

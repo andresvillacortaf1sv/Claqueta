@@ -1,0 +1,77 @@
+/**
+ * Formato de industria del guion. Medidas en pulgadas sobre una página US Letter
+ * (8.5in), fuente Courier Prime 12pt (10 caracteres por pulgada). Los sangrados
+ * de cada elemento siguen el estándar profesional.
+ */
+
+.ProseMirror {
+  font-family: var(--script-font);
+  font-size: 12pt;
+  line-height: 1;
+  color: var(--paper-ink);
+  outline: none;
+  min-height: 9in;
+  caret-color: var(--accent);
+}
+
+.ProseMirror ::selection {
+  background: rgba(200, 128, 58, 0.22);
+}
+
+/* Cada línea del guion */
+.sp-el {
+  margin: 0;
+  white-space: pre-wrap;
+  min-height: 1.15em;
+}
+
+/* Encabezado de escena: INT./EXT. ... - DÍA/NOCHE */
+.sp-scene-heading {
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-top: 1.5em;
+  margin-bottom: 1em;
+}
+.ProseMirror > .sp-scene-heading:first-child {
+  margin-top: 0;
+}
+
+/* Acción / descripción, a todo lo ancho de la caja de texto (6in) */
+.sp-action {
+  margin-bottom: 1em;
+}
+
+/* Personaje, centrado hacia la derecha */
+.sp-character {
+  text-transform: uppercase;
+  margin-top: 1em;
+  margin-left: 2.2in;
+}
+
+/* Acotación breve bajo el personaje */
+.sp-parenthetical {
+  margin-left: 1.6in;
+  margin-right: 1.9in;
+}
+
+/* Diálogo */
+.sp-dialogue {
+  margin-left: 1in;
+  margin-right: 1.5in;
+  margin-bottom: 1em;
+}
+
+/* Transición, alineada a la derecha */
+.sp-transition {
+  text-transform: uppercase;
+  text-align: right;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+/* Plano / indicación de cámara */
+.sp-shot {
+  text-transform: uppercase;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}

@@ -1,0 +1,32 @@
+{
+  "name": "claqueta",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Editor de guiones profesional, open-source y local-first. Núcleo basado en ProseMirror.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "prosemirror-commands": "^1.6.0",
+    "prosemirror-history": "^1.4.1",
+    "prosemirror-inputrules": "^1.4.0",
+    "prosemirror-keymap": "^1.2.2",
+    "prosemirror-model": "^1.23.0",
+    "prosemirror-state": "^1.4.3",
+    "prosemirror-view": "^1.34.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "tsx": "^4.23.15",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10"
+  }
+}
