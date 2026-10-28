@@ -23,6 +23,7 @@ Lo que ya funciona:
 - **Interfaz tipo ribbon** con pestañas **Inicio** (portapapeles, elemento desplegable, fuente: negrita/cursiva/subrayado/tachado, portada, archivo, páginas/PDF) y **Edición** (revisiones).
 - **Modo revisión** (pestaña **Edición**): elige un color y la **selección actual** queda sombreada al instante (con una barra de color a la izquierda); lo que sigas editando también se marca. Visible en editor, vista previa y PDF.
 - **Escaleta y navegador de escenas** (grupo **Esquema** en Inicio): barra lateral que lista las escenas y salta a ellas, y una **escaleta de tarjetas** (una por escena) con resumen editable y **reordenado por arrastre** que reacomoda el guion.
+- **Personajes y reportes** (grupo **Esquema** → **Personajes**): tablero con el reparto detectado automáticamente, con parlamentos, escenas y palabras por personaje, ficha editable y salto a su primera intervención.
 - **Página de título** editable (botón **Portada** en Inicio), incluida en la vista previa y el PDF.
 - **Local-first**: autoguardado en el navegador (localStorage). Nada sale del dispositivo.
 - Atajos de marcas: `Ctrl/Cmd + B / I / U`, deshacer/rehacer.
@@ -85,7 +86,7 @@ Pruebas de lógica (sin navegador): `npx tsx test/logic.test.ts` y `npx tsx test
 | 3 ✅ | Import/Export **FDX** (Final Draft) + soporte **Fountain** |
 | 4 ✅ | Modo revisiones (colores, sombreado) + página de título |
 | 5 ✅ | Escaleta / tarjetas (beat board) + navegador de escenas |
-| 6 | Sección de personajes + reportes (líneas, apariciones, arco) |
+| 6 ✅ | Sección de personajes + reportes + tablero de personajes |
 | 7 | Asistente de IA (trae tu propia clave) + empaquetado a escritorio con Tauri |
 
 ## Licencia

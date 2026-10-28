@@ -33,6 +33,7 @@ interface Props {
   navOpen: boolean;
   onToggleNav: () => void;
   onBeatBoard: () => void;
+  onCharacters: () => void;
 }
 
 function Group({ label, children }: { label: string; children: ReactNode }) {
@@ -141,6 +142,9 @@ export function Ribbon(props: Props) {
               </button>
               <button className="rb-btn" onClick={props.onBeatBoard} title="Escaleta de tarjetas">
                 Escaleta
+              </button>
+              <button className="rb-btn" onClick={props.onCharacters} title="Personajes y reportes">
+                Personajes
               </button>
             </Group>
 

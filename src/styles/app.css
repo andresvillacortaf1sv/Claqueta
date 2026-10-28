@@ -665,6 +665,67 @@ body {
   padding: 3rem;
 }
 
+/* ---------- Tarjetas de personaje ---------- */
+.char-card {
+  background: #f6f3ec;
+  color: #1b1a17;
+  border-radius: 8px;
+  padding: 0.75rem;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+.char-card-head {
+  margin-bottom: 0.4rem;
+}
+.char-name {
+  font-family: var(--script-font);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  background: transparent;
+  border: 0;
+  color: #1b1a17;
+  cursor: pointer;
+  padding: 0;
+}
+.char-name:hover {
+  text-decoration: underline;
+}
+.char-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  font-family: var(--ui-font);
+  font-size: 0.74rem;
+  color: #6b655b;
+  margin-bottom: 0.4rem;
+}
+.char-stats strong {
+  color: #1b1a17;
+}
+.char-bar {
+  height: 5px;
+  background: #e3ddd0;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+.char-bar-fill {
+  height: 100%;
+  background: var(--accent);
+}
+.char-note {
+  width: 100%;
+  min-height: 56px;
+  resize: vertical;
+  font-family: var(--ui-font);
+  font-size: 0.8rem;
+  color: #2a2824;
+  background: #fffdf9;
+  border: 1px solid #d9d3c7;
+  border-radius: 6px;
+  padding: 0.4rem;
+}
+
 .btn-primary {
   font-family: var(--ui-font);
   font-size: 0.8rem;

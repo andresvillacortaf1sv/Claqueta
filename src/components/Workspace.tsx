@@ -21,6 +21,9 @@ import { getScenes, Scene } from "../lib/scenes";
 import { jumpToScene, setSceneSummary, reorderScenes } from "../editor/sceneOps";
 import { SceneNavigator } from "./SceneNavigator";
 import { BeatBoard } from "./BeatBoard";
+import { getCharacters, CharacterStat } from "../lib/characters";
+import { loadCharacterNotes, saveCharacterNote, CharacterNotes } from "../lib/characterNotes";
+import { CharacterBoard } from "./CharacterBoard";
 import {
   ElementType,
   ELEMENT_LABELS,
@@ -63,6 +66,9 @@ export function Workspace() {
   const [scenes, setScenes] = useState<Scene[]>([]);
   const [showNav, setShowNav] = useState(false);
   const [showBeat, setShowBeat] = useState(false);
+  const [showChars, setShowChars] = useState(false);
+  const [chars, setChars] = useState<CharacterStat[]>([]);
+  const [charNotes, setCharNotes] = useState<CharacterNotes>({});
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -239,6 +245,19 @@ export function Workspace() {
     if (view) reorderScenes(view, from, to);
   }, []);
 
+  const openCharacters = useCallback(() => {
+    const view = viewRef.current;
+    if (!view) return;
+    setChars(getCharacters(view.state.doc));
+    setCharNotes(loadCharacterNotes());
+    setShowChars(true);
+  }, []);
+
+  const editCharNote = useCallback((name: string, text: string) => {
+    saveCharacterNote(name, text);
+    setCharNotes((prev) => ({ ...prev, [name]: text }));
+  }, []);
+
   // Atajos tipo Final Draft: Ctrl/Cmd + número para fijar el elemento.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -276,6 +295,7 @@ export function Workspace() {
         navOpen={showNav}
         onToggleNav={() => setShowNav((v) => !v)}
         onBeatBoard={() => setShowBeat(true)}
+        onCharacters={openCharacters}
       />
 
       <div className="editor-area">
@@ -320,6 +340,16 @@ export function Workspace() {
           onEditSummary={editSceneSummary}
           onJump={goToScene}
           onClose={() => setShowBeat(false)}
+        />
+      )}
+
+      {showChars && (
+        <CharacterBoard
+          characters={chars}
+          notes={charNotes}
+          onEditNote={editCharNote}
+          onJump={goToScene}
+          onClose={() => setShowChars(false)}
         />
       )}
     </div>
