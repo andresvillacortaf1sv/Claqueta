@@ -18,6 +18,10 @@ Lo que ya funciona:
 - **Formato de industria**: Courier Prime 12pt, página US Letter (8.5"), sangrados estándar por elemento, MAYÚSCULAS donde corresponde.
 - **Paginación de industria** (botón **Páginas / PDF**): reparte el guion en páginas US Letter (54 líneas), numera desde la página 2, controla huérfanos de encabezado/personaje y **parte diálogos largos con `(MÁS)` y `PERSONAJE (CONT'D)`**.
 - **Exportación a PDF** fiel al formato, generada en el navegador (sin servidor).
+- **Saltos de página en vivo** en el editor: mientras escribes aparece la marca "Página N" medida sobre el alto real del texto (la hoja crece y el texto nunca cae sobre el fondo).
+- **Interoperabilidad** (menú **Archivo**): importar y exportar **FDX** (Final Draft) y **Fountain** (texto plano abierto).
+- **Modo revisión** (menú **Revisión**): colores estándar de la industria (azul, rosa, amarillo…); los bloques que editas se marcan con un asterisco del color de la revisión, visible en editor, vista previa y PDF.
+- **Página de título** editable (botón **Portada**), incluida en la vista previa y el PDF.
 - **Local-first**: autoguardado en el navegador (localStorage). Nada sale del dispositivo.
 - Atajos de marcas: `Ctrl/Cmd + B / I / U`, deshacer/rehacer.
 
@@ -76,8 +80,8 @@ Pruebas de lógica (sin navegador): `npx tsx test/logic.test.ts` y `npx tsx test
 |------|---------|
 | 1 ✅ | Fundación: motor de editor + formato inteligente + estilos de industria |
 | 2 ✅ | Paginación de industria (US Letter, MÁS/CONT'D, numeración) + export a PDF |
-| 3 | Import/Export **FDX** (Final Draft) + soporte **Fountain** |
-| 4 | Modo revisiones (colores), asteriscos, bloqueo de páginas + página de título |
+| 3 ✅ | Import/Export **FDX** (Final Draft) + soporte **Fountain** |
+| 4 ✅ | Modo revisiones (colores + asteriscos) + página de título |
 | 5 | Escaleta / tarjetas (beat board) + navegador de escenas |
 | 6 | Sección de personajes + reportes (líneas, apariciones, arco) |
 | 7 | Asistente de IA (trae tu propia clave) + empaquetado a escritorio con Tauri |
