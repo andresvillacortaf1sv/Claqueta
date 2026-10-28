@@ -131,6 +131,9 @@ body {
     var(--desk);
   display: flex;
   justify-content: center;
+  /* flex-start evita que la hoja se "estire" a la altura de la ventana:
+     así crece con el contenido y el texto nunca cae sobre el gris. */
+  align-items: flex-start;
 }
 
 .page {
@@ -213,7 +216,113 @@ body {
 
 /* ---------- Botones ---------- */
 .toolbar-end {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   margin-left: 0.6rem;
+}
+
+/* ---------- Menú desplegable ---------- */
+.menu {
+  position: relative;
+}
+.menu-pop {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 5px);
+  min-width: 195px;
+  background: #26241f;
+  border: 1px solid var(--bar-line);
+  border-radius: 8px;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.5);
+  padding: 4px;
+  z-index: 40;
+}
+.menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.42rem 0.6rem;
+  font-family: var(--ui-font);
+  font-size: 0.82rem;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.menu-item:hover {
+  background: #332f29;
+}
+
+.rev-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.rev-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1px solid var(--bar-line);
+}
+
+/* ---------- Modal (portada) ---------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 8, 7, 0.72);
+}
+.modal {
+  width: min(92vw, 460px);
+  background: #24221e;
+  border: 1px solid var(--bar-line);
+  border-radius: 12px;
+  padding: 1.2rem 1.3rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+.modal-title {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.field {
+  display: block;
+  margin-bottom: 0.8rem;
+}
+.field > span {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 0.25rem;
+}
+.field input,
+.field textarea {
+  width: 100%;
+  font-family: var(--ui-font);
+  font-size: 0.9rem;
+  color: var(--ink);
+  background: #1b1a17;
+  border: 1px solid var(--bar-line);
+  border-radius: 6px;
+  padding: 0.45rem 0.55rem;
+  resize: vertical;
+}
+.field input:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
 }
 
 .btn-primary {
@@ -310,8 +419,53 @@ body {
 }
 
 .pv-line {
+  position: relative;
   height: 1em;
   white-space: pre;
+}
+.pv-line[data-rev]::after {
+  content: "*";
+  position: absolute;
+  right: -0.35in;
+  top: 0;
+  font-weight: 700;
+  color: var(--rev-color, #b1223b);
+}
+
+/* Portada en la vista previa */
+.pv-titlepage {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--script-font);
+  font-size: 12pt;
+}
+.pv-title-main {
+  flex: 1;
+  margin-top: 3.2in;
+  text-align: center;
+}
+.pv-title {
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.pv-byline {
+  margin-top: 0.5in;
+  line-height: 1.6;
+}
+.pv-basedon {
+  margin-top: 0.5in;
+}
+.pv-title-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.pv-contact {
+  white-space: pre-line;
+  text-align: left;
+}
+.pv-draft {
+  text-align: right;
 }
 
 .pv-blank {

@@ -75,3 +75,61 @@
   margin-top: 1em;
   margin-bottom: 1em;
 }
+
+/* Asterisco de revisión en el margen derecho de las líneas editadas */
+.sp-el[data-rev] {
+  position: relative;
+}
+.sp-el[data-rev]::after {
+  content: "*";
+  position: absolute;
+  top: 0;
+  font-weight: 700;
+  color: #666;
+}
+.sp-scene-heading[data-rev]::after,
+.sp-action[data-rev]::after,
+.sp-character[data-rev]::after,
+.sp-transition[data-rev]::after,
+.sp-shot[data-rev]::after {
+  right: -0.35in;
+}
+.sp-dialogue[data-rev]::after {
+  right: -1.85in;
+}
+.sp-parenthetical[data-rev]::after {
+  right: -2.25in;
+}
+.sp-el[data-rev="blue"]::after { color: #2d6cdf; }
+.sp-el[data-rev="pink"]::after { color: #e05aa0; }
+.sp-el[data-rev="yellow"]::after { color: #c9a21a; }
+.sp-el[data-rev="green"]::after { color: #2e9e5b; }
+.sp-el[data-rev="goldenrod"]::after { color: #b8860b; }
+.sp-el[data-rev="buff"]::after { color: #9c8457; }
+.sp-el[data-rev="salmon"]::after { color: #e8795a; }
+.sp-el[data-rev="cherry"]::after { color: #b1223b; }
+
+/* Marcador de salto de página (alto 0: no desplaza el texto) */
+.pm-pagebreak {
+  position: relative;
+  height: 0;
+}
+.pm-pagebreak::before {
+  content: "";
+  position: absolute;
+  left: -1.5in;
+  right: -1in;
+  top: -0.55em;
+  border-top: 1px dashed #cbc4b8;
+}
+.pm-pagebreak-label {
+  position: absolute;
+  right: -1in;
+  top: -1.5em;
+  font-family: var(--ui-font);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--accent, #b06a2e);
+  background: var(--paper, #fbfaf7);
+  padding: 0 0.3rem;
+}

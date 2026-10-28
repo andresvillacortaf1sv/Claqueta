@@ -7,6 +7,7 @@
  */
 import { Node as PMNode } from "prosemirror-model";
 import { schema } from "./schema";
+import { Block } from "../lib/serialize";
 
 const STORAGE_KEY = "claqueta:documento";
 
@@ -43,6 +44,15 @@ export function cargarDocumento(): PMNode {
     }
   }
   return documentoEjemplo();
+}
+
+/** Construye un documento ProseMirror a partir de una lista de bloques (import). */
+export function docFromBlocks(blocks: Block[]): PMNode {
+  const nodes = blocks.map((b) =>
+    schema.node(b.type, null, b.text ? [schema.text(b.text)] : []),
+  );
+  if (nodes.length === 0) nodes.push(schema.node("action"));
+  return schema.node("doc", null, nodes);
 }
 
 export function guardarDocumento(doc: PMNode): void {

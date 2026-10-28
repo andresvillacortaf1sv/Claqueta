@@ -9,12 +9,26 @@
 import { Schema, NodeSpec } from "prosemirror-model";
 
 function block(className: string, extra: Partial<NodeSpec> = {}): NodeSpec {
+  const attrs = { revision: { default: null as string | null }, ...(extra.attrs ?? {}) };
   return {
     content: "text*",
     group: "block",
-    parseDOM: [{ tag: `p.${className}` }],
-    toDOM: () => ["p", { class: `sp-el ${className}` }, 0],
+    parseDOM: [
+      {
+        tag: `p.${className}`,
+        getAttrs: (dom) => {
+          const rev = (dom as HTMLElement).getAttribute("data-rev");
+          return rev ? { revision: rev } : {};
+        },
+      },
+    ],
+    toDOM: (node) => {
+      const dom: Record<string, string> = { class: `sp-el ${className}` };
+      if (node.attrs.revision) dom["data-rev"] = node.attrs.revision;
+      return ["p", dom, 0];
+    },
     ...extra,
+    attrs,
   };
 }
 

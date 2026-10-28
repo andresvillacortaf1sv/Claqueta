@@ -8,6 +8,7 @@ import { ElementType, isElementType } from "../editor/elements";
 export interface Block {
   type: ElementType;
   text: string;
+  revision?: string | null;
 }
 
 export function docToBlocks(doc: PMNode): Block[] {
@@ -15,7 +16,7 @@ export function docToBlocks(doc: PMNode): Block[] {
   doc.forEach((node) => {
     const name = node.type.name;
     if (isElementType(name)) {
-      out.push({ type: name, text: node.textContent });
+      out.push({ type: name, text: node.textContent, revision: node.attrs.revision ?? null });
     }
   });
   return out;

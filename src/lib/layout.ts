@@ -54,6 +54,7 @@ export interface TextLine {
   kind: "text";
   style: ElementType;
   text: string;
+  revision?: string | null;
 }
 export interface BlankLine {
   kind: "blank";
@@ -119,11 +120,19 @@ export function paginate(blocks: Block[], rpp: number = LINES_PER_PAGE): Page[] 
     count = 0;
   };
   const room = () => rpp - count;
+  let currentRev: string | null = null;
   const placeContd = () => {
-    if (currentChar) place({ kind: "text", style: "character", text: `${currentChar} (CONT'D)` });
+    if (currentChar)
+      place({ kind: "text", style: "character", text: `${currentChar} (CONT'D)`, revision: currentRev });
   };
 
-  function placeSimple(type: ElementType, wrapped: string[], sb: number, nextHasLines: boolean) {
+  function placeSimple(
+    type: ElementType,
+    wrapped: string[],
+    sb: number,
+    nextHasLines: boolean,
+    rev: string | null,
+  ) {
     // Control de huérfanos: encabezado y personaje no deben quedar solos al pie.
     const needNext = (type === "scene_heading" || type === "character") && nextHasLines ? 1 : 0;
     const sbEff = count > 0 ? sb : 0;
@@ -131,10 +140,10 @@ export function paginate(blocks: Block[], rpp: number = LINES_PER_PAGE): Page[] 
       brk();
     }
     blankBefore(count > 0 ? sb : 0);
-    for (const t of wrapped) place({ kind: "text", style: type, text: t });
+    for (const t of wrapped) place({ kind: "text", style: type, text: t, revision: rev });
   }
 
-  function placeSplittable(type: ElementType, wrapped: string[], sb: number) {
+  function placeSplittable(type: ElementType, wrapped: string[], sb: number, rev: string | null) {
     if (count > 0) {
       if (count + sb >= rpp) brk();
       else blankBefore(sb);
@@ -151,15 +160,15 @@ export function paginate(blocks: Block[], rpp: number = LINES_PER_PAGE): Page[] 
           if (room() > 1) {
             const canPlace = room() - 1; // reservar una línea para "(MÁS)"
             for (let k = 0; k < canPlace; k++)
-              place({ kind: "text", style: "dialogue", text: wrapped[i++] });
-            place({ kind: "text", style: "dialogue", text: "(MÁS)" });
+              place({ kind: "text", style: "dialogue", text: wrapped[i++], revision: rev });
+            place({ kind: "text", style: "dialogue", text: "(MÁS)", revision: rev });
           }
           brk();
           placeContd();
           continue;
         }
       }
-      place({ kind: "text", style: type, text: wrapped[i++] });
+      place({ kind: "text", style: type, text: wrapped[i++], revision: rev });
     }
   }
 
@@ -169,17 +178,21 @@ export function paginate(blocks: Block[], rpp: number = LINES_PER_PAGE): Page[] 
     let text = b.text ?? "";
     if (m.upper) text = text.toUpperCase();
     if (!text.trim()) continue; // los bloques vacíos no aparecen en el guion paginado
-    if (b.type === "character") currentChar = text.trim();
+    const rev = b.revision ?? null;
+    if (b.type === "character") {
+      currentChar = text.trim();
+      currentRev = rev;
+    }
 
     const wrapped = wrap(text, m.width);
     const sb = SPACE_BEFORE[b.type];
 
     if (b.type === "action" || b.type === "dialogue") {
-      placeSplittable(b.type, wrapped, sb);
+      placeSplittable(b.type, wrapped, sb, rev);
     } else {
       const next = blocks[bi + 1];
       const nextHasLines = !!next && !!(next.text ?? "").trim();
-      placeSimple(b.type, wrapped, sb, nextHasLines);
+      placeSimple(b.type, wrapped, sb, nextHasLines, rev);
     }
   }
 
