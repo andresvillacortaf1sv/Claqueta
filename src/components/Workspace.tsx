@@ -2,13 +2,15 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { EditorState, Command } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import { history } from "prosemirror-history";
+import { toggleMark } from "prosemirror-commands";
+import { MarkType } from "prosemirror-model";
+import { schema } from "../editor/schema";
 import { screenplayKeymap, baseKeymapPlugin } from "../editor/keymap";
 import { screenplayInputRules } from "../editor/inputrules";
 import { paginationPlugin } from "../editor/pagination";
 import { revisionsPlugin, setRevisionMeta, clearRevisions } from "../editor/revisions";
 import { cargarDocumento, guardarDocumento, docFromBlocks } from "../editor/document";
 import { setElement } from "../editor/commands";
-import { Menu } from "./Menu";
 import { downloadText, pickTextFile } from "../lib/files";
 import { blocksToFdx, fdxToBlocks } from "../lib/fdx";
 import { blocksToFountain, fountainToBlocks } from "../lib/fountain";
@@ -22,12 +24,18 @@ import {
   TAB_CYCLE,
   isElementType,
 } from "../editor/elements";
-import { Toolbar } from "./Toolbar";
+import { Ribbon, MarkName, ActiveMarks } from "./Ribbon";
 import { StatusBar } from "./StatusBar";
 import { Preview } from "./Preview";
 import { docToBlocks, Block } from "../lib/serialize";
 
 type SaveState = "guardado" | "guardando";
+
+function markActive(state: EditorState, type: MarkType): boolean {
+  const { from, $from, to, empty } = state.selection;
+  if (empty) return !!type.isInSet(state.storedMarks || $from.marks());
+  return state.doc.rangeHasMark(from, to, type);
+}
 
 export function Workspace() {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -42,6 +50,12 @@ export function Workspace() {
   const [showTitleModal, setShowTitleModal] = useState(false);
   const [revEnabled, setRevEnabled] = useState(false);
   const [revId, setRevId] = useState<string>(REVISIONS[0].id);
+  const [activeMarks, setActiveMarks] = useState<ActiveMarks>({
+    strong: false,
+    em: false,
+    underline: false,
+    strikethrough: false,
+  });
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -67,6 +81,12 @@ export function Workspace() {
         const name = next.selection.$from.parent.type.name;
         if (isElementType(name)) setCurrent(name);
         setEmptyLine(next.selection.$from.parent.content.size === 0);
+        setActiveMarks({
+          strong: markActive(next, schema.marks.strong),
+          em: markActive(next, schema.marks.em),
+          underline: markActive(next, schema.marks.underline),
+          strikethrough: markActive(next, schema.marks.strikethrough),
+        });
 
         if (tr.docChanged) {
           setSave("guardando");
@@ -168,6 +188,31 @@ export function Workspace() {
     saveTitlePage(tp);
   }, []);
 
+  const toggleMarkByName = useCallback(
+    (name: MarkName) => run(toggleMark(schema.marks[name])),
+    [run],
+  );
+
+  const doCopy = useCallback(() => {
+    viewRef.current?.focus();
+    document.execCommand("copy");
+  }, []);
+  const doCut = useCallback(() => {
+    viewRef.current?.focus();
+    document.execCommand("cut");
+  }, []);
+  const doPaste = useCallback(async () => {
+    const view = viewRef.current;
+    if (!view) return;
+    view.focus();
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text) view.dispatch(view.state.tr.insertText(text));
+    } catch {
+      /* el navegador puede bloquear la lectura del portapapeles */
+    }
+  }, []);
+
   // Atajos tipo Final Draft: Ctrl/Cmd + número para fijar el elemento.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -183,53 +228,25 @@ export function Workspace() {
 
   return (
     <div className="workspace">
-      <Toolbar
+      <Ribbon
         current={current}
-        onPick={applyElement}
-        actions={
-          <>
-            <Menu
-              label="Archivo"
-              items={[
-                { label: "Importar FDX…", onClick: importFdx },
-                { label: "Importar Fountain…", onClick: importFountain },
-                { label: "Exportar FDX", onClick: exportFdx },
-                { label: "Exportar Fountain", onClick: exportFountain },
-              ]}
-            />
-            <Menu
-              label={
-                <span className="rev-label">
-                  <span
-                    className="rev-dot"
-                    style={{
-                      background: revEnabled
-                        ? REVISIONS.find((r) => r.id === revId)?.hex
-                        : "transparent",
-                    }}
-                  />
-                  Revisión
-                </span>
-              }
-              items={[
-                ...(revEnabled
-                  ? [{ label: "✓ Desactivar revisión", onClick: disableRevision }]
-                  : []),
-                ...REVISIONS.map((r) => ({
-                  label: `${revEnabled && r.id === revId ? "● " : "○ "}${r.label}`,
-                  onClick: () => pickRevision(r.id),
-                })),
-                { label: "Limpiar marcas", onClick: clearAllRevisions },
-              ]}
-            />
-            <button className="btn-ghost" onClick={() => setShowTitleModal(true)}>
-              Portada
-            </button>
-            <button className="btn-primary" onClick={openPreview} title="Vista paginada y PDF">
-              Páginas / PDF
-            </button>
-          </>
-        }
+        onPickElement={applyElement}
+        activeMarks={activeMarks}
+        onToggleMark={toggleMarkByName}
+        onCut={doCut}
+        onCopy={doCopy}
+        onPaste={doPaste}
+        onPortada={() => setShowTitleModal(true)}
+        onPreview={openPreview}
+        onImportFdx={importFdx}
+        onImportFountain={importFountain}
+        onExportFdx={exportFdx}
+        onExportFountain={exportFountain}
+        revEnabled={revEnabled}
+        revId={revId}
+        onPickRevision={pickRevision}
+        onDisableRevision={disableRevision}
+        onClearRevisions={clearAllRevisions}
       />
 
       <div className="page-scroll">

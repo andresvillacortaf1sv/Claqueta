@@ -325,6 +325,165 @@ body {
   margin-top: 0.6rem;
 }
 
+/* ---------- Ribbon (barra con pestañas) ---------- */
+.ribbon {
+  background: var(--bar);
+  border-bottom: 1px solid var(--bar-line);
+}
+.ribbon-tabbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0 0.6rem;
+  border-bottom: 1px solid var(--bar-line);
+}
+.ribbon-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem;
+}
+.ribbon-tabs {
+  display: flex;
+  gap: 0.2rem;
+}
+.rb-tab {
+  font-family: var(--ui-font);
+  font-size: 0.82rem;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  padding: 0.5rem 0.85rem;
+  cursor: pointer;
+}
+.rb-tab:hover {
+  color: var(--ink);
+}
+.rb-tab.is-active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.ribbon-panel {
+  display: flex;
+  align-items: stretch;
+  padding: 0.4rem 0.5rem;
+}
+.rb-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.28rem;
+  padding: 0 0.75rem;
+  border-right: 1px solid var(--bar-line);
+}
+.rb-group:last-child {
+  border-right: 0;
+}
+.rb-group-body {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 38px;
+}
+.rb-group-label {
+  font-size: 0.66rem;
+  letter-spacing: 0.03em;
+  color: var(--muted-dim);
+}
+
+.rb-btn {
+  font-family: var(--ui-font);
+  font-size: 0.8rem;
+  color: var(--ink);
+  background: #2a2824;
+  border: 1px solid var(--bar-line);
+  border-radius: 6px;
+  padding: 0.35rem 0.6rem;
+  cursor: pointer;
+}
+.rb-btn:hover {
+  background: #34312b;
+}
+.rb-btn.is-on {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: rgba(200, 128, 58, 0.45);
+}
+.rb-btn-primary {
+  color: #1a1407;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.rb-btn-primary:hover {
+  filter: brightness(1.08);
+  background: var(--accent);
+}
+
+.rb-select {
+  font-family: var(--ui-font);
+  font-size: 0.82rem;
+  color: var(--ink);
+  background: #2a2824;
+  border: 1px solid var(--bar-line);
+  border-radius: 6px;
+  padding: 0.38rem 0.5rem;
+  min-width: 150px;
+  cursor: pointer;
+}
+
+.rb-tgl {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--ui-font);
+  font-size: 0.92rem;
+  color: var(--ink);
+  background: #2a2824;
+  border: 1px solid var(--bar-line);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.rb-tgl:hover {
+  background: #34312b;
+}
+.rb-tgl.is-on {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: rgba(200, 128, 58, 0.45);
+}
+
+.rb-swatches {
+  display: flex;
+  gap: 0.25rem;
+}
+.rb-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
+}
+.rb-swatch.is-on {
+  border-color: var(--ink);
+}
+.rb-rev-status {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-left: 0.4rem;
+}
+
+/* El menú Archivo dentro del ribbon toma el aspecto de botón del ribbon */
+.rb-group .menu > .btn-ghost {
+  background: #2a2824;
+  font-size: 0.8rem;
+  padding: 0.35rem 0.6rem;
+}
+
 .btn-primary {
   font-family: var(--ui-font);
   font-size: 0.8rem;
@@ -422,14 +581,6 @@ body {
   position: relative;
   height: 1em;
   white-space: pre;
-}
-.pv-line[data-rev]::after {
-  content: "*";
-  position: absolute;
-  right: -0.35in;
-  top: 0;
-  font-weight: 700;
-  color: var(--rev-color, #b1223b);
 }
 
 /* Portada en la vista previa */

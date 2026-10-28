@@ -26,6 +26,13 @@ function hexToRgb(hex: string): [number, number, number] {
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
 
+/** Aclara un color hacia el blanco para usarlo como sombreado de revisión. */
+function lighten(hex: string, t = 0.8): [number, number, number] {
+  const [r, g, b] = hexToRgb(hex);
+  const mix = (c: number) => Math.round(c * (1 - t) + 255 * t);
+  return [mix(r), mix(g), mix(b)];
+}
+
 function drawTitlePage(doc: jsPDF, tp: TitlePage): void {
   doc.setFont("courier", "normal");
   doc.setFontSize(12);
@@ -76,21 +83,22 @@ export function exportarPDF(blocks: Block[], titlePage?: TitlePage, titulo = "gu
     page.lines.forEach((line, n) => {
       if (line.kind === "blank") return;
       const m = METRICS[line.style];
-      doc.setFont("courier", m.bold ? "bold" : "normal");
-      doc.setTextColor(0, 0, 0);
       const y = TOP_MARGIN + LINE_H * (n + 1);
-      if (m.align === "right") doc.text(line.text, RIGHT_EDGE, y, { align: "right" });
-      else doc.text(line.text, LEFT_MARGIN + m.indent * CHAR_W, y);
 
-      // Asterisco de revisión en el margen derecho.
+      // Sombreado de revisión (rectángulo claro detrás de la línea).
       if (line.revision) {
         const rev = revisionById(line.revision);
-        const [r, g, b] = hexToRgb(rev?.hex ?? "#b1223b");
-        doc.setTextColor(r, g, b);
-        doc.setFont("courier", "bold");
-        doc.text("*", RIGHT_EDGE + 18, y);
-        doc.setTextColor(0, 0, 0);
+        const [lr, lg, lb] = lighten(rev?.hex ?? "#b1223b");
+        const w = Math.max(line.text.length, 1) * CHAR_W;
+        const x = m.align === "right" ? RIGHT_EDGE - w : LEFT_MARGIN + m.indent * CHAR_W;
+        doc.setFillColor(lr, lg, lb);
+        doc.rect(x - 1.5, y - 9.5, w + 3, LINE_H, "F");
       }
+
+      doc.setFont("courier", m.bold ? "bold" : "normal");
+      doc.setTextColor(0, 0, 0);
+      if (m.align === "right") doc.text(line.text, RIGHT_EDGE, y, { align: "right" });
+      else doc.text(line.text, LEFT_MARGIN + m.indent * CHAR_W, y);
     });
   });
 

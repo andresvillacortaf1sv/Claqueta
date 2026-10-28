@@ -22,6 +22,7 @@ export const screenplayKeymap = keymap({
   "Mod-b": toggleMark(schema.marks.strong),
   "Mod-i": toggleMark(schema.marks.em),
   "Mod-u": toggleMark(schema.marks.underline),
+  "Mod-Shift-s": toggleMark(schema.marks.strikethrough),
 });
 
 export const baseKeymapPlugin = keymap(baseKeymap);

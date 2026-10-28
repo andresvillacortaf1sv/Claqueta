@@ -20,8 +20,9 @@ Lo que ya funciona:
 - **Exportación a PDF** fiel al formato, generada en el navegador (sin servidor).
 - **Saltos de página en vivo** en el editor: mientras escribes aparece la marca "Página N" medida sobre el alto real del texto (la hoja crece y el texto nunca cae sobre el fondo).
 - **Interoperabilidad** (menú **Archivo**): importar y exportar **FDX** (Final Draft) y **Fountain** (texto plano abierto).
-- **Modo revisión** (menú **Revisión**): colores estándar de la industria (azul, rosa, amarillo…); los bloques que editas se marcan con un asterisco del color de la revisión, visible en editor, vista previa y PDF.
-- **Página de título** editable (botón **Portada**), incluida en la vista previa y el PDF.
+- **Interfaz tipo ribbon** con pestañas **Inicio** (portapapeles, elemento desplegable, fuente: negrita/cursiva/subrayado/tachado, portada, archivo, páginas/PDF) y **Edición** (revisiones).
+- **Modo revisión** (pestaña **Edición**): colores estándar de la industria (azul, rosa, amarillo…); los bloques que editas quedan **sombreados** en el color de la revisión, visible en editor, vista previa y PDF.
+- **Página de título** editable (botón **Portada** en Inicio), incluida en la vista previa y el PDF.
 - **Local-first**: autoguardado en el navegador (localStorage). Nada sale del dispositivo.
 - Atajos de marcas: `Ctrl/Cmd + B / I / U`, deshacer/rehacer.
 

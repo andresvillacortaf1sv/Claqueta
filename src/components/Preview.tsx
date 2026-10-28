@@ -74,10 +74,9 @@ export function Preview({ blocks, titlePage, onClose }: Props) {
                   <div
                     className={`pv-line pv-${l.style}`}
                     key={i}
-                    data-rev={l.revision ?? undefined}
                     style={
                       l.revision
-                        ? ({ ["--rev-color" as string]: revisionById(l.revision)?.hex } as React.CSSProperties)
+                        ? { backgroundColor: (revisionById(l.revision)?.hex ?? "#b1223b") + "2e" }
                         : undefined
                     }
                   >

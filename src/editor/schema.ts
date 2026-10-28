@@ -66,6 +66,10 @@ export const schema = new Schema({
       parseDOM: [{ tag: "u" }],
       toDOM: () => ["u", 0],
     },
+    strikethrough: {
+      parseDOM: [{ tag: "s" }, { tag: "strike" }, { style: "text-decoration=line-through" }],
+      toDOM: () => ["s", 0],
+    },
   },
 });
 

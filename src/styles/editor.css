@@ -76,38 +76,21 @@
   margin-bottom: 1em;
 }
 
-/* Asterisco de revisión en el margen derecho de las líneas editadas */
+/* Sombreado de revisión: el bloque editado queda resaltado en su color.
+   box-decoration-break hace que el sombreado cubra bien las líneas envueltas. */
 .sp-el[data-rev] {
-  position: relative;
+  border-radius: 2px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
-.sp-el[data-rev]::after {
-  content: "*";
-  position: absolute;
-  top: 0;
-  font-weight: 700;
-  color: #666;
-}
-.sp-scene-heading[data-rev]::after,
-.sp-action[data-rev]::after,
-.sp-character[data-rev]::after,
-.sp-transition[data-rev]::after,
-.sp-shot[data-rev]::after {
-  right: -0.35in;
-}
-.sp-dialogue[data-rev]::after {
-  right: -1.85in;
-}
-.sp-parenthetical[data-rev]::after {
-  right: -2.25in;
-}
-.sp-el[data-rev="blue"]::after { color: #2d6cdf; }
-.sp-el[data-rev="pink"]::after { color: #e05aa0; }
-.sp-el[data-rev="yellow"]::after { color: #c9a21a; }
-.sp-el[data-rev="green"]::after { color: #2e9e5b; }
-.sp-el[data-rev="goldenrod"]::after { color: #b8860b; }
-.sp-el[data-rev="buff"]::after { color: #9c8457; }
-.sp-el[data-rev="salmon"]::after { color: #e8795a; }
-.sp-el[data-rev="cherry"]::after { color: #b1223b; }
+.sp-el[data-rev="blue"] { background: rgba(45, 108, 223, 0.18); }
+.sp-el[data-rev="pink"] { background: rgba(224, 90, 160, 0.18); }
+.sp-el[data-rev="yellow"] { background: rgba(201, 162, 26, 0.22); }
+.sp-el[data-rev="green"] { background: rgba(46, 158, 91, 0.18); }
+.sp-el[data-rev="goldenrod"] { background: rgba(184, 134, 11, 0.20); }
+.sp-el[data-rev="buff"] { background: rgba(156, 132, 87, 0.22); }
+.sp-el[data-rev="salmon"] { background: rgba(232, 121, 90, 0.20); }
+.sp-el[data-rev="cherry"] { background: rgba(177, 34, 59, 0.16); }
 
 /* Marcador de salto de página (alto 0: no desplaza el texto) */
 .pm-pagebreak {
