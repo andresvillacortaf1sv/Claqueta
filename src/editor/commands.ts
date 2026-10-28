@@ -9,7 +9,13 @@
  */
 import { Command, EditorState, Transaction } from "prosemirror-state";
 import { setBlockType } from "prosemirror-commands";
-import { ElementType, TAB_CYCLE, ENTER_NEXT, isElementType } from "./elements";
+import {
+  ElementType,
+  TAB_CYCLE,
+  ENTER_NEXT,
+  EMPTY_ENTER_CYCLE,
+  isElementType,
+} from "./elements";
 import { nodeTypeFor } from "./schema";
 
 function currentElement(state: EditorState): ElementType | null {
@@ -24,28 +30,31 @@ export function setElement(type: ElementType): Command {
 }
 
 /**
- * Enter: parte el bloque actual y asigna al nuevo bloque el tipo que sigue
- * de forma natural según ENTER_NEXT.
+ * Enter inteligente, con dos comportamientos:
  *
- * Caso especial: si el bloque está vacío (p. ej. un DIÁLOGO sin texto) y no es
- * ACCIÓN, pulsar Enter lo convierte en ACCIÓN en lugar de crear otro vacío —
- * igual que el "salir del diálogo" de los editores profesionales.
+ *  a) Línea CON texto → parte el bloque y crea el siguiente elemento lógico
+ *     según ENTER_NEXT (p. ej. tras un PERSONAJE, un DIÁLOGO).
+ *
+ *  b) Línea VACÍA → no crea líneas en blanco; en su lugar rota el tipo del
+ *     bloque actual por EMPTY_ENTER_CYCLE. Dando Enter repetidamente, el usuario
+ *     recorre acción → personaje → diálogo → … hasta el elemento que quiere.
  */
 export const smartEnter: Command = (state, dispatch) => {
   const current = currentElement(state);
   if (!current) return false;
 
   const parent = state.selection.$from.parent;
-  const isEmpty = parent.content.size === 0;
+  const isEmpty = parent.content.size === 0 && state.selection.empty;
 
-  // Bloque vacío que no es acción → convertir a acción y no partir.
-  if (isEmpty && current !== "action" && state.selection.empty) {
-    return setBlockType(nodeTypeFor("action"))(state, dispatch);
+  // (b) Línea vacía: rotar al siguiente tipo del ciclo.
+  if (isEmpty) {
+    const idx = EMPTY_ENTER_CYCLE.indexOf(current);
+    const nextName = EMPTY_ENTER_CYCLE[(idx + 1) % EMPTY_ENTER_CYCLE.length];
+    return setBlockType(nodeTypeFor(nextName))(state, dispatch);
   }
 
-  const nextName = ENTER_NEXT[current];
-  const nextType = nodeTypeFor(nextName);
-
+  // (a) Línea con texto: partir y crear el siguiente elemento lógico.
+  const nextType = nodeTypeFor(ENTER_NEXT[current]);
   if (dispatch) {
     const tr: Transaction = state.tr;
     if (!state.selection.empty) tr.deleteSelection();

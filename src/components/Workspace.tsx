@@ -15,6 +15,8 @@ import {
 } from "../editor/elements";
 import { Toolbar } from "./Toolbar";
 import { StatusBar } from "./StatusBar";
+import { Preview } from "./Preview";
+import { docToBlocks, Block } from "../lib/serialize";
 
 type SaveState = "guardado" | "guardando";
 
@@ -24,7 +26,9 @@ export function Workspace() {
   const saveTimer = useRef<number | null>(null);
 
   const [current, setCurrent] = useState<ElementType>("action");
+  const [emptyLine, setEmptyLine] = useState(false);
   const [save, setSave] = useState<SaveState>("guardado");
+  const [previewBlocks, setPreviewBlocks] = useState<Block[] | null>(null);
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -47,6 +51,7 @@ export function Workspace() {
 
         const name = next.selection.$from.parent.type.name;
         if (isElementType(name)) setCurrent(name);
+        setEmptyLine(next.selection.$from.parent.content.size === 0);
 
         if (tr.docChanged) {
           setSave("guardando");
@@ -81,6 +86,12 @@ export function Workspace() {
     [run],
   );
 
+  const openPreview = useCallback(() => {
+    const view = viewRef.current;
+    if (!view) return;
+    setPreviewBlocks(docToBlocks(view.state.doc));
+  }, []);
+
   // Atajos tipo Final Draft: Ctrl/Cmd + número para fijar el elemento.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -96,7 +107,7 @@ export function Workspace() {
 
   return (
     <div className="workspace">
-      <Toolbar current={current} onPick={applyElement} />
+      <Toolbar current={current} onPick={applyElement} onPreview={openPreview} />
 
       <div className="page-scroll">
         <div className="page">
@@ -108,8 +119,13 @@ export function Workspace() {
         current={current}
         label={ELEMENT_LABELS[current]}
         hint={ELEMENT_HINTS[current]}
+        empty={emptyLine}
         save={save}
       />
+
+      {previewBlocks && (
+        <Preview blocks={previewBlocks} onClose={() => setPreviewBlocks(null)} />
+      )}
     </div>
   );
 }

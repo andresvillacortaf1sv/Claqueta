@@ -3,9 +3,10 @@ import { ElementType, ELEMENT_LABELS, TAB_CYCLE } from "../editor/elements";
 interface Props {
   current: ElementType;
   onPick: (type: ElementType) => void;
+  onPreview: () => void;
 }
 
-export function Toolbar({ current, onPick }: Props) {
+export function Toolbar({ current, onPick, onPreview }: Props) {
   return (
     <div className="toolbar">
       <div className="toolbar-brand">
@@ -26,6 +27,12 @@ export function Toolbar({ current, onPick }: Props) {
             {ELEMENT_LABELS[type]}
           </button>
         ))}
+      </div>
+
+      <div className="toolbar-end">
+        <button className="btn-primary" onClick={onPreview} title="Vista paginada y exportar PDF">
+          Páginas / PDF
+        </button>
       </div>
     </div>
   );

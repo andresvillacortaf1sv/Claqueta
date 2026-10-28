@@ -4,10 +4,11 @@ interface Props {
   current: ElementType;
   label: string;
   hint: string;
+  empty: boolean;
   save: "guardado" | "guardando";
 }
 
-export function StatusBar({ current, label, hint, save }: Props) {
+export function StatusBar({ current, label, hint, empty, save }: Props) {
   const next = ELEMENT_LABELS[ENTER_NEXT[current]];
   return (
     <div className="statusbar">
@@ -17,7 +18,15 @@ export function StatusBar({ current, label, hint, save }: Props) {
       </div>
       <div className="status-right">
         <span className="status-keys">
-          <kbd>Tab</kbd> cambia · <kbd>Enter</kbd> → {next}
+          {empty ? (
+            <>
+              <kbd>Enter</kbd> cambia de elemento · <kbd>Tab</kbd> también
+            </>
+          ) : (
+            <>
+              <kbd>Tab</kbd> cambia · <kbd>Enter</kbd> → {next}
+            </>
+          )}
         </span>
         <span className={"status-save " + save}>
           {save === "guardado" ? "● Guardado" : "○ Guardando…"}

@@ -63,6 +63,22 @@ export const ENTER_NEXT: Record<ElementType, ElementType> = {
   shot: "action",
 };
 
+/**
+ * Ciclo al pulsar Enter sobre una línea VACÍA. En vez de crear líneas en blanco,
+ * cada Enter rota el tipo del bloque actual por este orden (de más a menos usado
+ * y en bucle). Así, dando Enter varias veces, el usuario "pasa" por acción,
+ * personaje, diálogo, etc. hasta el que quiera, sin necesidad de Tab.
+ */
+export const EMPTY_ENTER_CYCLE: ElementType[] = [
+  "action",
+  "character",
+  "dialogue",
+  "parenthetical",
+  "transition",
+  "scene_heading",
+  "shot",
+];
+
 /** Elementos cuyo texto se muestra en MAYÚSCULAS (vía CSS). */
 export const UPPERCASE_ELEMENTS: ElementType[] = [
   "scene_heading",

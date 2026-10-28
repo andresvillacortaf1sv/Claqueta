@@ -211,7 +211,134 @@ body {
   color: var(--ok);
 }
 
+/* ---------- Botones ---------- */
+.toolbar-end {
+  margin-left: 0.6rem;
+}
+
+.btn-primary {
+  font-family: var(--ui-font);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #1a1407;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  padding: 0.38rem 0.75rem;
+  cursor: pointer;
+  transition: filter 0.12s;
+}
+.btn-primary:hover {
+  filter: brightness(1.08);
+}
+
+.btn-ghost {
+  font-family: var(--ui-font);
+  font-size: 0.8rem;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--bar-line);
+  border-radius: 6px;
+  padding: 0.38rem 0.75rem;
+  cursor: pointer;
+}
+.btn-ghost:hover {
+  background: #2c2a27;
+}
+
+/* ---------- Vista previa paginada ---------- */
+.preview-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  background: rgba(10, 10, 9, 0.96);
+}
+
+.preview-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1rem;
+  background: var(--bar);
+  border-bottom: 1px solid var(--bar-line);
+}
+
+.preview-count {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.preview-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.preview-scroll {
+  flex: 1;
+  overflow: auto;
+  padding: 2rem 1rem 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.4rem;
+}
+
+.pv-page {
+  position: relative;
+  width: 8.5in;
+  min-height: 11in;
+  background: var(--paper);
+  color: var(--paper-ink);
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.5);
+  padding: 1in 1in 1in 1.5in;
+}
+
+.pv-num {
+  position: absolute;
+  top: 0.5in;
+  right: 1in;
+  font-family: var(--script-font);
+  font-size: 12pt;
+}
+
+.pv-body {
+  font-family: var(--script-font);
+  font-size: 12pt;
+  line-height: 1;
+}
+
+.pv-line {
+  height: 1em;
+  white-space: pre;
+}
+
+.pv-blank {
+  height: 1em;
+}
+
+.pv-scene-heading {
+  font-weight: 700;
+}
+.pv-character {
+  padding-left: 2.2in;
+}
+.pv-parenthetical {
+  padding-left: 1.6in;
+}
+.pv-dialogue {
+  padding-left: 1in;
+}
+.pv-transition {
+  text-align: right;
+}
+
 @media (max-width: 920px) {
+  .pv-page {
+    width: 100%;
+    padding: 0.7in 0.6in 0.7in 0.8in;
+  }
   .page {
     width: 100%;
     min-width: 0;

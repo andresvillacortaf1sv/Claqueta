@@ -4,18 +4,20 @@ Editor de guiones profesional, **open-source** y **local-first**. Un "Final Draf
 
 > **Claqueta** es un nombre de trabajo (la tablilla de cine). Cámbialo cuando quieras en `package.json`, `index.html` y la barra de herramientas.
 
-## Estado actual — Fase 1: Fundación ✅
+## Estado actual — Fases 1 y 2 ✅
 
 Lo que ya funciona:
 
 - **Motor de editor** sobre ProseMirror con esquema estricto de guion (7 elementos: encabezado, acción, personaje, paréntesis, diálogo, transición, plano).
 - **Formato inteligente**:
   - `Tab` / `Shift-Tab` ciclan el tipo de elemento.
-  - `Enter` crea el **siguiente elemento lógico** (p. ej. tras un PERSONAJE viene un DIÁLOGO; tras una TRANSICIÓN, un ENCABEZADO).
-  - `Enter` en un diálogo/elemento vacío "sale" a ACCIÓN.
+  - `Enter` con texto crea el **siguiente elemento lógico** (p. ej. tras un PERSONAJE viene un DIÁLOGO; tras una TRANSICIÓN, un ENCABEZADO).
+  - `Enter` en una **línea vacía rota el tipo** (acción → personaje → diálogo → …): das Enter varias veces hasta el elemento que quieras, sin crear líneas en blanco.
   - `Ctrl/Cmd + 1..7` fija el elemento directamente.
 - **Reglas automáticas**: teclear `INT.` / `EXT.` crea un encabezado de escena; `CORTE A:` / `FUNDE A:` crean una transición.
 - **Formato de industria**: Courier Prime 12pt, página US Letter (8.5"), sangrados estándar por elemento, MAYÚSCULAS donde corresponde.
+- **Paginación de industria** (botón **Páginas / PDF**): reparte el guion en páginas US Letter (54 líneas), numera desde la página 2, controla huérfanos de encabezado/personaje y **parte diálogos largos con `(MÁS)` y `PERSONAJE (CONT'D)`**.
+- **Exportación a PDF** fiel al formato, generada en el navegador (sin servidor).
 - **Local-first**: autoguardado en el navegador (localStorage). Nada sale del dispositivo.
 - Atajos de marcas: `Ctrl/Cmd + B / I / U`, deshacer/rehacer.
 
@@ -54,18 +56,26 @@ src/
     Workspace.tsx   Monta el editor y conecta barra/estado
     Toolbar.tsx     Selector de elementos
     StatusBar.tsx   Elemento actual + pistas de teclado
+  components/
+    Preview.tsx     Vista paginada + botón de exportar PDF
+  lib/
+    serialize.ts    Documento ProseMirror → lista de bloques
+    layout.ts       Paginador de industria (función pura, sin DOM)
+    pdf.ts          Exportación a PDF con jsPDF (carga diferida)
+    (próximas fases: fdx.ts, fountain.ts…)
   styles/
-    app.css         Interfaz (escritorio oscuro, página de papel)
+    app.css         Interfaz (escritorio oscuro, página de papel, vista previa)
     editor.css      Formato del guion (medidas de industria)
-  lib/              (próximas fases: fdx, fountain, pdf, paginación…)
 ```
+
+Pruebas de lógica (sin navegador): `npx tsx test/logic.test.ts` y `npx tsx test/layout.test.ts`.
 
 ## Hoja de ruta
 
 | Fase | Entrega |
 |------|---------|
 | 1 ✅ | Fundación: motor de editor + formato inteligente + estilos de industria |
-| 2 | Paginación de industria (US Letter, MÁS/CONT., numeración) + export a PDF |
+| 2 ✅ | Paginación de industria (US Letter, MÁS/CONT'D, numeración) + export a PDF |
 | 3 | Import/Export **FDX** (Final Draft) + soporte **Fountain** |
 | 4 | Modo revisiones (colores), asteriscos, bloqueo de páginas + página de título |
 | 5 | Escaleta / tarjetas (beat board) + navegador de escenas |

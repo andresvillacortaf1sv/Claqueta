@@ -54,11 +54,18 @@ function types(doc: PMNode): string[] {
   check("Enter: TRANSICIÓN → ENCABEZADO", types(after.doc)[1] === "scene_heading");
 }
 
-// 3. Enter en DIÁLOGO vacío lo convierte en ACCIÓN (no parte)
+// 3. Enter repetido en línea VACÍA rota el tipo sin crear líneas nuevas
 {
-  const doc = schema.node("doc", null, [schema.node("dialogue")]);
-  const after = apply(stateFrom(doc), smartEnter);
-  check("Enter: DIÁLOGO vacío → ACCIÓN sin partir", types(after.doc).join(",") === "action");
+  // Acción vacía: Enter → personaje; Enter de nuevo → diálogo
+  let st = stateFrom(schema.node("doc", null, [schema.node("action")]));
+  st = apply(st, smartEnter);
+  const t1 = types(st.doc).join(",");
+  st = apply(st, smartEnter);
+  const t2 = types(st.doc).join(",");
+  check(
+    "Enter vacío rota ACCIÓN → PERSONAJE → DIÁLOGO sin partir",
+    t1 === "character" && t2 === "dialogue",
+  );
 }
 
 // 4. Tab cicla ACCIÓN → PERSONAJE
