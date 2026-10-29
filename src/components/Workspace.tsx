@@ -33,6 +33,9 @@ import { getSceneBreakdown, SceneBreakdown } from "../lib/breakdown";
 import { getLocations, LocationStat } from "../lib/locations";
 import { loadBreakdown, setBreakdownField, BreakdownData, Category } from "../lib/breakdownStore";
 import { Breakdown } from "./Breakdown";
+import { buildGraph, Graph } from "../lib/graph";
+import { NeuralMap } from "./NeuralMap";
+import { AnalysisPanel } from "./AnalysisPanel";
 import {
   ElementType,
   ELEMENT_LABELS,
@@ -90,6 +93,8 @@ export function Workspace() {
   const [bdScenes, setBdScenes] = useState<SceneBreakdown[]>([]);
   const [bdLocs, setBdLocs] = useState<LocationStat[]>([]);
   const [bdData, setBdData] = useState<BreakdownData>({});
+  const [neuralGraph, setNeuralGraph] = useState<Graph | null>(null);
+  const [showAnalysis, setShowAnalysis] = useState(false);
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -353,6 +358,12 @@ export function Workspace() {
     downloadText(filename, "﻿" + csv, "text/csv");
   }, []);
 
+  const openNeural = useCallback(() => {
+    const view = viewRef.current;
+    if (!view) return;
+    setNeuralGraph(buildGraph(view.state.doc, loadBreakdown()));
+  }, []);
+
   // Atajos tipo Final Draft: Ctrl/Cmd + número para fijar el elemento.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -402,6 +413,8 @@ export function Workspace() {
         onFindReplace={() => setShowFind(true)}
         onVersions={openVersions}
         onBreakdown={openBreakdown}
+        onNeural={openNeural}
+        onAnalysis={() => setShowAnalysis(true)}
       />
 
       <div className="editor-area">
@@ -506,6 +519,14 @@ export function Workspace() {
           onExport={exportCsv}
           onClose={() => setShowBreakdown(false)}
         />
+      )}
+
+      {neuralGraph && (
+        <NeuralMap graph={neuralGraph} onJump={goToScene} onClose={() => setNeuralGraph(null)} />
+      )}
+
+      {showAnalysis && (
+        <AnalysisPanel getBlocks={currentBlocks} onClose={() => setShowAnalysis(false)} />
       )}
     </div>
   );

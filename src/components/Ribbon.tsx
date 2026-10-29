@@ -45,6 +45,8 @@ interface Props {
   onFindReplace: () => void;
   onVersions: () => void;
   onBreakdown: () => void;
+  onNeural: () => void;
+  onAnalysis: () => void;
 }
 
 function Group({ label, children }: { label: string; children: ReactNode }) {
@@ -256,6 +258,14 @@ export function Ribbon(props: Props) {
             <Group label="Producción">
               <button className="rb-btn rb-btn-primary" onClick={props.onBreakdown} title="Desglose de guion">
                 Desglose de guion
+              </button>
+            </Group>
+            <Group label="Análisis">
+              <button className="rb-btn" onClick={props.onNeural} title="Grafo estructural del guion">
+                Red neuronal
+              </button>
+              <button className="rb-btn" onClick={props.onAnalysis} title="Análisis del guion (métricas + IA)">
+                Análisis
               </button>
             </Group>
           </>
