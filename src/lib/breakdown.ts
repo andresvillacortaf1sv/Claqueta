@@ -10,6 +10,7 @@ export interface SceneBreakdown {
   place: string;
   time: string;
   cast: string[]; // personajes con intervención en la escena
+  body: string; // texto de la escena (para previsualizar)
 }
 
 function canonical(raw: string): string {
@@ -19,6 +20,7 @@ function canonical(raw: string): string {
 export function getSceneBreakdown(doc: PMNode): SceneBreakdown[] {
   const scenes: SceneBreakdown[] = [];
   const casts: Set<string>[] = [];
+  const bodies: string[][] = [];
   let current: SceneBreakdown | null = null;
 
   doc.forEach((node, offset) => {
@@ -33,16 +35,28 @@ export function getSceneBreakdown(doc: PMNode): SceneBreakdown[] {
         place,
         time,
         cast: [],
+        body: "",
       };
       scenes.push(current);
       casts.push(new Set());
-    } else if (t === "character" && current) {
-      const name = canonical(node.textContent);
-      if (name) casts[current.index].add(name);
+      bodies.push([]);
+    } else if (current) {
+      if (t === "character") {
+        const name = canonical(node.textContent);
+        if (name) casts[current.index].add(name);
+      }
+      const txt = node.textContent.trim();
+      if (txt) {
+        const label = t === "character" ? txt.toUpperCase() : t === "parenthetical" ? `  ${txt}` : txt;
+        bodies[current.index].push(label);
+      }
     }
   });
 
-  scenes.forEach((s) => (s.cast = [...casts[s.index]]));
+  scenes.forEach((s) => {
+    s.cast = [...casts[s.index]];
+    s.body = bodies[s.index].join("\n");
+  });
   return scenes;
 }
 

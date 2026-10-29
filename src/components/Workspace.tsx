@@ -22,6 +22,7 @@ import { jumpToScene, setSceneSummary, reorderScenes } from "../editor/sceneOps"
 import { SceneNavigator } from "./SceneNavigator";
 import { BeatBoard } from "./BeatBoard";
 import { getCharacters, CharacterStat } from "../lib/characters";
+import { mergeCharacters, addManualCharacter } from "../lib/manualCharacters";
 import { CharacterBoard } from "./CharacterBoard";
 import { CharacterBio } from "./CharacterBio";
 import { RelationMap } from "./RelationMap";
@@ -38,6 +39,7 @@ import { NeuralMap } from "./NeuralMap";
 import { AnalysisPanel } from "./AnalysisPanel";
 import { ConceptBoard } from "./ConceptBoard";
 import { Direction } from "./Direction";
+import { DevelopmentModal } from "./DevelopmentModal";
 import {
   ElementType,
   ELEMENT_LABELS,
@@ -99,6 +101,7 @@ export function Workspace() {
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [showConcept, setShowConcept] = useState(false);
   const [dirScenes, setDirScenes] = useState<SceneBreakdown[] | null>(null);
+  const [showDev, setShowDev] = useState(false);
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -281,8 +284,14 @@ export function Workspace() {
   const openCharacters = useCallback(() => {
     const view = viewRef.current;
     if (!view) return;
-    setChars(getCharacters(view.state.doc));
+    setChars(mergeCharacters(getCharacters(view.state.doc)));
     setShowChars(true);
+  }, []);
+
+  const addManual = useCallback((name: string) => {
+    addManualCharacter(name);
+    const view = viewRef.current;
+    if (view) setChars(mergeCharacters(getCharacters(view.state.doc)));
   }, []);
 
   const doUndo = useCallback(() => run(undo), [run]);
@@ -427,6 +436,7 @@ export function Workspace() {
         onAnalysis={() => setShowAnalysis(true)}
         onConceptBoard={() => setShowConcept(true)}
         onDirection={openDirection}
+        onDevelopment={() => setShowDev(true)}
       />
 
       <div className="editor-area">
@@ -479,6 +489,7 @@ export function Workspace() {
           characters={chars}
           onOpenBio={(name) => setBioName(name)}
           onOpenMap={() => setShowMap(true)}
+          onAddManual={addManual}
           onJump={goToScene}
           onClose={() => setShowChars(false)}
         />
@@ -546,6 +557,8 @@ export function Workspace() {
       {dirScenes && (
         <Direction scenes={dirScenes} onJump={goToScene} onClose={() => setDirScenes(null)} />
       )}
+
+      {showDev && <DevelopmentModal onClose={() => setShowDev(false)} />}
     </div>
   );
 }

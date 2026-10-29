@@ -49,6 +49,7 @@ interface Props {
   onAnalysis: () => void;
   onConceptBoard: () => void;
   onDirection: () => void;
+  onDevelopment: () => void;
 }
 
 function Group({ label, children }: { label: string; children: ReactNode }) {
@@ -196,6 +197,9 @@ export function Ribbon(props: Props) {
             </Group>
 
             <Group label="Documento">
+              <button className="rb-btn" onClick={props.onDevelopment} title="Logline, tagline, sinopsis y tratamiento">
+                Desarrollo
+              </button>
               <button className="rb-btn" onClick={props.onPortada} title="Página de título">
                 Portada
               </button>

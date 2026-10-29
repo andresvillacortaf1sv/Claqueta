@@ -3,7 +3,7 @@
  * modo de línea de tiempo. Guardado local por tablero.
  */
 
-export type CardKind = "idea" | "nota" | "hito";
+export type CardKind = "idea" | "nota" | "hito" | "imagen";
 
 export interface BoardCard {
   id: string;
@@ -13,6 +13,7 @@ export interface BoardCard {
   y: number;
   color: string;
   date?: string; // sólo para hitos (línea de tiempo)
+  image?: string; // dataURL (sólo para tarjetas de imagen)
 }
 
 export interface BoardEdge {
@@ -32,6 +33,7 @@ export const CARD_KINDS: { id: CardKind; label: string; color: string }[] = [
   { id: "idea", label: "Idea", color: "#c8803a" },
   { id: "nota", label: "Nota", color: "#2d6cdf" },
   { id: "hito", label: "Hito", color: "#2e9e5b" },
+  { id: "imagen", label: "Imagen", color: "#8a63d2" },
 ];
 
 const KEY = "claqueta:pizarras";

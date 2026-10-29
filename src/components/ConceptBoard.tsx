@@ -9,6 +9,7 @@ import {
   defaultBoard,
   newId,
 } from "../lib/board";
+import { fileToResizedDataURL } from "../lib/imageResize";
 
 interface Props {
   onClose: () => void;
@@ -22,6 +23,7 @@ export function ConceptBoard({ onClose }: Props) {
   const [mode, setMode] = useState<Mode>("libre");
   const [connectFrom, setConnectFrom] = useState<string | null>(null);
   const surfaceRef = useRef<HTMLDivElement>(null);
+  const imgInput = useRef<HTMLInputElement>(null);
   const drag = useRef<{ id: string; dx: number; dy: number } | null>(null);
 
   const board = boards.find((b) => b.id === activeId) ?? boards[0];
@@ -37,6 +39,10 @@ export function ConceptBoard({ onClose }: Props) {
   );
 
   const addCard = (kind: CardKind) => {
+    if (kind === "imagen") {
+      imgInput.current?.click();
+      return;
+    }
     const color = CARD_KINDS.find((k) => k.id === kind)!.color;
     const card: BoardCard = {
       id: newId("c"),
@@ -49,6 +55,27 @@ export function ConceptBoard({ onClose }: Props) {
     };
     update((b) => ({ ...b, cards: [...b.cards, card] }));
   };
+
+  async function onAddImage(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    try {
+      const image = await fileToResizedDataURL(file, 600);
+      const card: BoardCard = {
+        id: newId("c"),
+        kind: "imagen",
+        text: "",
+        x: 60 + Math.random() * 120,
+        y: 60 + Math.random() * 120,
+        color: "#8a63d2",
+        image,
+      };
+      update((b) => ({ ...b, cards: [...b.cards, card] }));
+    } catch {
+      /* imagen inválida */
+    }
+  }
 
   const editCard = (id: string, patch: Partial<BoardCard>) =>
     update((b) => ({ ...b, cards: b.cards.map((c) => (c.id === id ? { ...c, ...patch } : c)) }));
@@ -128,6 +155,8 @@ export function ConceptBoard({ onClose }: Props) {
         </button>
       </div>
 
+      <input ref={imgInput} type="file" accept="image/*" hidden onChange={onAddImage} />
+
       {mode === "libre" ? (
         <>
           <div className="cb-toolbar">
@@ -179,10 +208,13 @@ export function ConceptBoard({ onClose }: Props) {
                     onChange={(e) => editCard(c.id, { date: e.target.value })}
                   />
                 )}
+                {c.kind === "imagen" && c.image && (
+                  <img className="cb-img" src={c.image} alt="" draggable={false} />
+                )}
                 <textarea
                   className="cb-text"
                   value={c.text}
-                  placeholder="Escribe…"
+                  placeholder={c.kind === "imagen" ? "Pie de imagen…" : "Escribe…"}
                   onChange={(e) => editCard(c.id, { text: e.target.value })}
                 />
               </div>

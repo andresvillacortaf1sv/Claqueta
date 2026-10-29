@@ -1,21 +1,41 @@
+import { useState } from "react";
 import { CharacterStat } from "../lib/characters";
 
 interface Props {
   characters: CharacterStat[];
   onOpenBio: (name: string) => void;
   onOpenMap: () => void;
+  onAddManual: (name: string) => void;
   onJump: (pos: number) => void;
   onClose: () => void;
 }
 
-export function CharacterBoard({ characters, onOpenBio, onOpenMap, onJump, onClose }: Props) {
+export function CharacterBoard({ characters, onOpenBio, onOpenMap, onAddManual, onJump, onClose }: Props) {
   const maxDialogues = Math.max(1, ...characters.map((c) => c.dialogues));
+  const [newName, setNewName] = useState("");
+
+  const add = () => {
+    if (newName.trim()) {
+      onAddManual(newName);
+      setNewName("");
+    }
+  };
 
   return (
     <div className="beatboard-overlay" role="dialog" aria-label="Personajes">
       <div className="beatboard-bar">
         <span className="beatboard-count">Personajes · {characters.length}</span>
-        <span className="beatboard-hint">Reparto detectado automáticamente del guion</span>
+        <div className="char-add">
+          <input
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && add()}
+            placeholder="Nombre del personaje"
+          />
+          <button className="rb-btn" onClick={add}>
+            + Añadir
+          </button>
+        </div>
         <button className="btn-ghost" onClick={onOpenMap}>
           Mapa relacional
         </button>
@@ -41,9 +61,15 @@ export function CharacterBoard({ characters, onOpenBio, onOpenMap, onJump, onClo
             </div>
 
             <div className="char-stats">
-              <span><strong>{c.dialogues}</strong> parlamentos</span>
-              <span><strong>{c.scenes}</strong> escenas</span>
-              <span><strong>{c.words}</strong> palabras</span>
+              {c.dialogues === 0 && c.scenes === 0 ? (
+                <span className="char-manual-tag">añadido manualmente</span>
+              ) : (
+                <>
+                  <span><strong>{c.dialogues}</strong> parlamentos</span>
+                  <span><strong>{c.scenes}</strong> escenas</span>
+                  <span><strong>{c.words}</strong> palabras</span>
+                </>
+              )}
             </div>
 
             <div className="char-bar">

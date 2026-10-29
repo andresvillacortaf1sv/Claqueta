@@ -3,7 +3,6 @@ import { SceneBreakdown } from "../lib/breakdown";
 import {
   DirectionData,
   DirectionScene,
-  DEPARTMENTS,
   DeptId,
   STATUS_OPTIONS,
   SHOT_TYPES,
@@ -14,8 +13,13 @@ import {
   saveDirection,
   getScene,
   emptyShot,
+  allDepartments,
+  addCustomDepartment,
+  removeCustomDepartment,
+  DEPARTMENTS,
 } from "../lib/direction";
 import { fileToResizedDataURL } from "../lib/imageResize";
+import { ShootSchedule } from "./ShootSchedule";
 
 interface Props {
   scenes: SceneBreakdown[];
@@ -23,12 +27,15 @@ interface Props {
   onClose: () => void;
 }
 
-type Tab = "desglose" | "storyboard" | "planos";
+type Tab = "desglose" | "storyboard" | "planos" | "plan";
 
 export function Direction({ scenes, onJump, onClose }: Props) {
   const [data, setData] = useState<DirectionData>(() => loadDirection());
   const [tab, setTab] = useState<Tab>("desglose");
   const [sel, setSel] = useState(0);
+  const [depts, setDepts] = useState(() => allDepartments());
+  const [newDept, setNewDept] = useState("");
+  const [showScene, setShowScene] = useState(true);
   const storyInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -91,6 +98,9 @@ export function Direction({ scenes, onJump, onClose }: Props) {
           <button className={tab === "planos" ? "is-on" : ""} onClick={() => setTab("planos")}>
             Lista de planos
           </button>
+          <button className={tab === "plan" ? "is-on" : ""} onClick={() => setTab("plan")}>
+            Plan de rodaje
+          </button>
         </div>
         <button className="btn-ghost" onClick={() => { onJump(scene.pos); onClose(); }}>
           Ir a la escena
@@ -100,6 +110,9 @@ export function Direction({ scenes, onJump, onClose }: Props) {
         </button>
       </div>
 
+      {tab === "plan" ? (
+        <ShootSchedule scenes={scenes} embedded />
+      ) : (
       <div className="dir-body">
         {/* Lista de escenas */}
         <aside className="dir-scenes">
@@ -125,22 +138,67 @@ export function Direction({ scenes, onJump, onClose }: Props) {
         <div className="dir-main">
           {tab === "desglose" && (
             <div className="dir-depts">
-              <h3 className="dir-title">{scene.heading}</h3>
-              {DEPARTMENTS.map((dep) => (
+              <div className="dir-depts-head">
+                <h3 className="dir-title">{scene.heading}</h3>
+                <button className="rb-btn" onClick={() => setShowScene((v) => !v)}>
+                  {showScene ? "Ocultar escena" : "Ver escena"}
+                </button>
+              </div>
+              {showScene && (
+                <pre className="dir-scene-text">{scene.body || "(escena sin contenido)"}</pre>
+              )}
+
+              <div className="dir-add-dept">
+                <input
+                  value={newDept}
+                  onChange={(e) => setNewDept(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && newDept.trim()) {
+                      setDepts(addCustomDepartment(newDept));
+                      setNewDept("");
+                    }
+                  }}
+                  placeholder="Nuevo departamento…"
+                />
+                <button
+                  className="rb-btn"
+                  onClick={() => {
+                    if (newDept.trim()) {
+                      setDepts(addCustomDepartment(newDept));
+                      setNewDept("");
+                    }
+                  }}
+                >
+                  + Departamento
+                </button>
+              </div>
+
+              {depts.map((dep) => (
                 <div className="dir-dept" key={dep.id}>
                   <div className="dir-dept-head">
                     <span className="dir-dept-name">{dep.label}</span>
-                    <select
-                      className="dir-status"
-                      value={ds.status[dep.id] ?? "Sin empezar"}
-                      onChange={(e) => setStatus(dep.id, e.target.value)}
-                    >
-                      {STATUS_OPTIONS.map((o) => (
-                        <option key={o} value={o}>
-                          {o}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="dir-dept-head-right">
+                      <select
+                        className="dir-status"
+                        value={ds.status[dep.id] ?? "Sin empezar"}
+                        onChange={(e) => setStatus(dep.id, e.target.value)}
+                      >
+                        {STATUS_OPTIONS.map((o) => (
+                          <option key={o} value={o}>
+                            {o}
+                          </option>
+                        ))}
+                      </select>
+                      {!DEPARTMENTS.some((d) => d.id === dep.id) && (
+                        <button
+                          className="dir-dept-del"
+                          title="Quitar departamento"
+                          onClick={() => setDepts(removeCustomDepartment(dep.id))}
+                        >
+                          ×
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <textarea
                     className="dir-note"
@@ -234,6 +292,7 @@ export function Direction({ scenes, onJump, onClose }: Props) {
           )}
         </div>
       </div>
+      )}
     </div>
   );
 }

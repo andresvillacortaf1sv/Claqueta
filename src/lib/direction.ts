@@ -18,7 +18,49 @@ export const DEPARTMENTS = [
   { id: "edicion", label: "Edición" },
 ] as const;
 
-export type DeptId = (typeof DEPARTMENTS)[number]["id"];
+export type DeptId = string;
+
+const DEPTS_KEY = "claqueta:departamentos";
+
+/** Departamentos personalizados que el usuario añadió. */
+export function loadCustomDepartments(): { id: string; label: string }[] {
+  try {
+    const v = JSON.parse(localStorage.getItem(DEPTS_KEY) || "[]");
+    return Array.isArray(v) ? v : [];
+  } catch {
+    return [];
+  }
+}
+
+export function addCustomDepartment(label: string): { id: string; label: string }[] {
+  const name = label.trim();
+  if (!name) return loadCustomDepartments();
+  const id = "custom-" + name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  const list = loadCustomDepartments();
+  if (!list.some((d) => d.id === id) && !DEPARTMENTS.some((d) => d.id === id)) {
+    list.push({ id, label: name });
+    try {
+      localStorage.setItem(DEPTS_KEY, JSON.stringify(list));
+    } catch {
+      /* no disponible */
+    }
+  }
+  return list;
+}
+
+export function removeCustomDepartment(id: string): { id: string; label: string }[] {
+  const list = loadCustomDepartments().filter((d) => d.id !== id);
+  try {
+    localStorage.setItem(DEPTS_KEY, JSON.stringify(list));
+  } catch {
+    /* no disponible */
+  }
+  return list;
+}
+
+export function allDepartments(): { id: string; label: string }[] {
+  return [...DEPARTMENTS, ...loadCustomDepartments()];
+}
 
 export const SHOT_TYPES = [
   "Gran plano general (EWS)",
