@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { EditorState, Command } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
-import { history } from "prosemirror-history";
+import { history, undo, redo, undoDepth, redoDepth } from "prosemirror-history";
 import { toggleMark } from "prosemirror-commands";
 import { MarkType } from "prosemirror-model";
 import { schema } from "../editor/schema";
@@ -24,6 +24,14 @@ import { BeatBoard } from "./BeatBoard";
 import { getCharacters, CharacterStat } from "../lib/characters";
 import { loadCharacterNotes, saveCharacterNote, CharacterNotes } from "../lib/characterNotes";
 import { CharacterBoard } from "./CharacterBoard";
+import { loadVersions, saveVersion, deleteVersion, Version } from "../lib/versions";
+import { VersionsPanel } from "./VersionsPanel";
+import { countMatches, replaceAll, findNext, FindOptions } from "../editor/findReplace";
+import { FindReplace } from "./FindReplace";
+import { getSceneBreakdown, SceneBreakdown } from "../lib/breakdown";
+import { getLocations, LocationStat } from "../lib/locations";
+import { loadBreakdown, setBreakdownField, BreakdownData, Category } from "../lib/breakdownStore";
+import { Breakdown } from "./Breakdown";
 import {
   ElementType,
   ELEMENT_LABELS,
@@ -69,6 +77,17 @@ export function Workspace() {
   const [showChars, setShowChars] = useState(false);
   const [chars, setChars] = useState<CharacterStat[]>([]);
   const [charNotes, setCharNotes] = useState<CharacterNotes>({});
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
+  const [night, setNight] = useState(() => localStorage.getItem("claqueta:tema") === "noche");
+  const [spell, setSpell] = useState(() => localStorage.getItem("claqueta:ortografia") !== "off");
+  const [showVersions, setShowVersions] = useState(false);
+  const [versions, setVersions] = useState<Version[]>([]);
+  const [showFind, setShowFind] = useState(false);
+  const [showBreakdown, setShowBreakdown] = useState(false);
+  const [bdScenes, setBdScenes] = useState<SceneBreakdown[]>([]);
+  const [bdLocs, setBdLocs] = useState<LocationStat[]>([]);
+  const [bdData, setBdData] = useState<BreakdownData>({});
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -100,6 +119,8 @@ export function Workspace() {
           underline: markActive(next, schema.marks.underline),
           strikethrough: markActive(next, schema.marks.strikethrough),
         });
+        setCanUndo(undoDepth(next) > 0);
+        setCanRedo(redoDepth(next) > 0);
 
         if (tr.docChanged) {
           setScenes(getScenes(next.doc));
@@ -114,6 +135,7 @@ export function Workspace() {
     });
 
     viewRef.current = view;
+    view.dom.setAttribute("spellcheck", String(spell));
     setScenes(getScenes(view.state.doc));
     view.focus();
 
@@ -258,6 +280,83 @@ export function Workspace() {
     setCharNotes((prev) => ({ ...prev, [name]: text }));
   }, []);
 
+  const doUndo = useCallback(() => run(undo), [run]);
+  const doRedo = useCallback(() => run(redo), [run]);
+
+  const toggleNight = useCallback(() => {
+    setNight((v) => {
+      const next = !v;
+      localStorage.setItem("claqueta:tema", next ? "noche" : "dia");
+      return next;
+    });
+  }, []);
+
+  const toggleSpell = useCallback(() => {
+    setSpell((v) => {
+      const next = !v;
+      localStorage.setItem("claqueta:ortografia", next ? "on" : "off");
+      viewRef.current?.dom.setAttribute("spellcheck", String(next));
+      return next;
+    });
+  }, []);
+
+  // --- Versiones ---
+  const openVersions = useCallback(() => {
+    setVersions(loadVersions());
+    setShowVersions(true);
+  }, []);
+  const saveVer = useCallback(
+    (name: string) => {
+      saveVersion(name, currentBlocks());
+      setVersions(loadVersions());
+    },
+    [currentBlocks],
+  );
+  const restoreVer = useCallback(
+    (v: Version) => {
+      if (window.confirm(`¿Restaurar «${v.name}»? Se reemplazará el guion actual.`)) {
+        replaceWithBlocks(v.blocks);
+        setShowVersions(false);
+      }
+    },
+    [replaceWithBlocks],
+  );
+  const deleteVer = useCallback((id: string) => {
+    deleteVersion(id);
+    setVersions(loadVersions());
+  }, []);
+
+  // --- Buscar y reemplazar ---
+  const doFindNext = useCallback((q: string, opts: FindOptions) => {
+    const view = viewRef.current;
+    return view ? findNext(view, q, opts) : false;
+  }, []);
+  const doReplaceAll = useCallback((q: string, r: string, opts: FindOptions) => {
+    const view = viewRef.current;
+    return view ? replaceAll(view, q, r, opts) : 0;
+  }, []);
+  const doCount = useCallback((q: string, opts: FindOptions) => {
+    const view = viewRef.current;
+    return view ? countMatches(view.state, q, opts) : 0;
+  }, []);
+
+  // --- Desglose ---
+  const openBreakdown = useCallback(() => {
+    const view = viewRef.current;
+    if (!view) return;
+    setBdScenes(getSceneBreakdown(view.state.doc));
+    setChars(getCharacters(view.state.doc));
+    setBdLocs(getLocations(getScenes(view.state.doc).map((s) => s.heading)));
+    setBdData(loadBreakdown());
+    setShowBreakdown(true);
+  }, []);
+  const setBreakdown = useCallback((key: string, cat: Category, value: string) => {
+    setBdData((prev) => setBreakdownField(prev, key, cat, value));
+  }, []);
+  const exportCsv = useCallback((filename: string, csv: string) => {
+    downloadText(filename, "﻿" + csv, "text/csv");
+  }, []);
+
   // Atajos tipo Final Draft: Ctrl/Cmd + número para fijar el elemento.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -272,7 +371,7 @@ export function Workspace() {
   }, [applyElement]);
 
   return (
-    <div className="workspace">
+    <div className={"workspace" + (night ? " night" : "")}>
       <Ribbon
         current={current}
         onPickElement={applyElement}
@@ -296,6 +395,17 @@ export function Workspace() {
         onToggleNav={() => setShowNav((v) => !v)}
         onBeatBoard={() => setShowBeat(true)}
         onCharacters={openCharacters}
+        canUndo={canUndo}
+        canRedo={canRedo}
+        onUndo={doUndo}
+        onRedo={doRedo}
+        night={night}
+        onToggleNight={toggleNight}
+        spell={spell}
+        onToggleSpell={toggleSpell}
+        onFindReplace={() => setShowFind(true)}
+        onVersions={openVersions}
+        onBreakdown={openBreakdown}
       />
 
       <div className="editor-area">
@@ -350,6 +460,39 @@ export function Workspace() {
           onEditNote={editCharNote}
           onJump={goToScene}
           onClose={() => setShowChars(false)}
+        />
+      )}
+
+      {showFind && (
+        <FindReplace
+          onFindNext={doFindNext}
+          onReplaceAll={doReplaceAll}
+          onCount={doCount}
+          onClose={() => setShowFind(false)}
+        />
+      )}
+
+      {showVersions && (
+        <VersionsPanel
+          versions={versions}
+          current={currentBlocks()}
+          onSave={saveVer}
+          onRestore={restoreVer}
+          onDelete={deleteVer}
+          onClose={() => setShowVersions(false)}
+        />
+      )}
+
+      {showBreakdown && (
+        <Breakdown
+          scenes={bdScenes}
+          characters={chars}
+          locations={bdLocs}
+          data={bdData}
+          onSetField={setBreakdown}
+          onJump={goToScene}
+          onExport={exportCsv}
+          onClose={() => setShowBreakdown(false)}
         />
       )}
     </div>

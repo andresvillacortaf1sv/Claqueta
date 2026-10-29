@@ -34,6 +34,17 @@ interface Props {
   onToggleNav: () => void;
   onBeatBoard: () => void;
   onCharacters: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
+  onUndo: () => void;
+  onRedo: () => void;
+  night: boolean;
+  onToggleNight: () => void;
+  spell: boolean;
+  onToggleSpell: () => void;
+  onFindReplace: () => void;
+  onVersions: () => void;
+  onBreakdown: () => void;
 }
 
 function Group({ label, children }: { label: string; children: ReactNode }) {
@@ -46,7 +57,7 @@ function Group({ label, children }: { label: string; children: ReactNode }) {
 }
 
 export function Ribbon(props: Props) {
-  const [tab, setTab] = useState<"inicio" | "edicion">("inicio");
+  const [tab, setTab] = useState<"inicio" | "edicion" | "herramientas">("inicio");
   const m = props.activeMarks;
 
   return (
@@ -69,11 +80,17 @@ export function Ribbon(props: Props) {
           >
             Edición
           </button>
+          <button
+            className={"rb-tab" + (tab === "herramientas" ? " is-active" : "")}
+            onClick={() => setTab("herramientas")}
+          >
+            Herramientas
+          </button>
         </div>
       </div>
 
       <div className="ribbon-panel">
-        {tab === "inicio" ? (
+        {tab === "inicio" && (
           <>
             <Group label="Portapapeles">
               <button className="rb-btn" onClick={props.onPaste} title="Pegar">
@@ -84,6 +101,15 @@ export function Ribbon(props: Props) {
               </button>
               <button className="rb-btn" onClick={props.onCopy} title="Copiar">
                 Copiar
+              </button>
+            </Group>
+
+            <Group label="Historial">
+              <button className="rb-btn" onClick={props.onUndo} disabled={!props.canUndo} title="Deshacer (Ctrl/Cmd+Z)">
+                ↶ Deshacer
+              </button>
+              <button className="rb-btn" onClick={props.onRedo} disabled={!props.canRedo} title="Rehacer (Ctrl/Cmd+Y)">
+                ↷ Rehacer
               </button>
             </Group>
 
@@ -132,6 +158,23 @@ export function Ribbon(props: Props) {
               </button>
             </Group>
 
+            <Group label="Vista">
+              <button
+                className={"rb-btn" + (props.night ? " is-on" : "")}
+                onClick={props.onToggleNight}
+                title="Modo noche"
+              >
+                {props.night ? "☀ Día" : "☾ Noche"}
+              </button>
+              <button
+                className={"rb-btn" + (props.spell ? " is-on" : "")}
+                onClick={props.onToggleSpell}
+                title="Revisión de ortografía"
+              >
+                Ortografía
+              </button>
+            </Group>
+
             <Group label="Esquema">
               <button
                 className={"rb-btn" + (props.navOpen ? " is-on" : "")}
@@ -166,7 +209,9 @@ export function Ribbon(props: Props) {
               </button>
             </Group>
           </>
-        ) : (
+        )}
+
+        {tab === "edicion" && (
           <Group label="Revisión">
             <div className="rb-swatches">
               {REVISIONS.map((r) => (
@@ -194,6 +239,26 @@ export function Ribbon(props: Props) {
                 : "Desactivado"}
             </span>
           </Group>
+        )}
+
+        {tab === "herramientas" && (
+          <>
+            <Group label="Texto">
+              <button className="rb-btn" onClick={props.onFindReplace} title="Buscar y reemplazar">
+                Buscar / Reemplazar
+              </button>
+            </Group>
+            <Group label="Borradores">
+              <button className="rb-btn" onClick={props.onVersions} title="Control de versiones">
+                Versiones
+              </button>
+            </Group>
+            <Group label="Producción">
+              <button className="rb-btn rb-btn-primary" onClick={props.onBreakdown} title="Desglose de guion">
+                Desglose de guion
+              </button>
+            </Group>
+          </>
         )}
       </div>
     </div>

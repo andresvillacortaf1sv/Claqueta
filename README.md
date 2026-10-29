@@ -24,6 +24,10 @@ Lo que ya funciona:
 - **Modo revisión** (pestaña **Edición**): elige un color y la **selección actual** queda sombreada al instante (con una barra de color a la izquierda); lo que sigas editando también se marca. Visible en editor, vista previa y PDF.
 - **Escaleta y navegador de escenas** (grupo **Esquema** en Inicio): barra lateral que lista las escenas y salta a ellas, y una **escaleta de tarjetas** (una por escena) con resumen editable y **reordenado por arrastre** que reacomoda el guion.
 - **Personajes y reportes** (grupo **Esquema** → **Personajes**): tablero con el reparto detectado automáticamente, con parlamentos, escenas y palabras por personaje, ficha editable y salto a su primera intervención.
+- **Modo noche, deshacer/rehacer y ortografía** en la pestaña Inicio (grupos Historial y Vista).
+- **Control de versiones** (Herramientas → **Versiones**): guarda borradores con nombre y fecha, y **compara** cualquiera contra el guion actual con un diff línea a línea (añadidos/eliminados); permite restaurar.
+- **Buscar y reemplazar** (Herramientas): por tipo de elemento, con may/min, palabra completa y **expresiones regulares**.
+- **Desglose de guion** (Herramientas → **Desglose**): hoja de desglose por escena (INT/EXT, lugar, momento, reparto automático y categorías de producción editables: utilería, vestuario, vehículos, extras, efectos, notas) más reportes de **personajes** y **lugares**, con **exportación a CSV**.
 - **Página de título** editable (botón **Portada** en Inicio), incluida en la vista previa y el PDF.
 - **Local-first**: autoguardado en el navegador (localStorage). Nada sale del dispositivo.
 - Atajos de marcas: `Ctrl/Cmd + B / I / U`, deshacer/rehacer.
