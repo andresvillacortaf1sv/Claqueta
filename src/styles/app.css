@@ -1233,3 +1233,275 @@ body {
   color: var(--muted);
   font-weight: 600;
 }
+
+/* ---------- Biblia de personaje ---------- */
+.bio-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  background: rgba(14, 13, 12, 0.98);
+}
+.bio-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 1rem;
+  background: var(--bar);
+  border-bottom: 1px solid var(--bar-line);
+}
+.bio-bar-name {
+  font-family: var(--script-font);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-size: 1rem;
+}
+.bio-bar-sub {
+  color: var(--muted);
+  font-size: 0.78rem;
+  margin-right: auto;
+}
+.bio-body {
+  flex: 1;
+  overflow: auto;
+  padding: 1.4rem;
+  max-width: 1000px;
+  width: 100%;
+  margin: 0 auto;
+}
+.bio-head {
+  display: flex;
+  gap: 1.2rem;
+  margin-bottom: 1.2rem;
+}
+.bio-photo {
+  width: 120px;
+  height: 150px;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #2a2824;
+  border: 1px solid var(--bar-line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.bio-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.bio-photo-empty {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.bio-head-fields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.bio-section {
+  margin-bottom: 1.4rem;
+}
+.bio-section-title {
+  margin: 0 0 0.6rem;
+  font-size: 0.9rem;
+  color: var(--ink);
+  border-bottom: 1px solid var(--bar-line);
+  padding-bottom: 0.3rem;
+}
+.bio-field {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+.bio-label {
+  display: block;
+  font-size: 0.74rem;
+  color: var(--muted);
+  margin-bottom: 0.25rem;
+}
+.bio-input,
+.bio-select,
+.bio-area {
+  width: 100%;
+  font-family: var(--ui-font);
+  font-size: 0.85rem;
+  color: var(--ink);
+  background: #1b1a17;
+  border: 1px solid var(--bar-line);
+  border-radius: 6px;
+  padding: 0.4rem 0.5rem;
+}
+.bio-area {
+  resize: vertical;
+  line-height: 1.4;
+}
+.bio-input:focus,
+.bio-select:focus,
+.bio-area:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.bio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.6rem;
+}
+.bio-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
+.bio-misc {
+  margin-top: 0.8rem;
+}
+.bio-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.4rem;
+}
+.bio-slider {
+  margin-bottom: 0.5rem;
+}
+.bio-slider-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: var(--ink);
+  margin-bottom: 0.15rem;
+}
+.bio-slider-val {
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.bio-slider input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+.bio-rels {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.bio-rel {
+  border-left: 3px solid var(--accent);
+  background: #201f1b;
+  border-radius: 6px;
+  padding: 0.5rem;
+}
+.bio-rel-row {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+.bio-rel-row .bio-select {
+  flex: 1;
+}
+.bio-rel-x {
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+.char-bio-btn {
+  width: 100%;
+  margin-top: 0.2rem;
+}
+@media (max-width: 760px) {
+  .bio-grid-2,
+  .bio-cols {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Mapa relacional ---------- */
+.relmap-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-right: auto;
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+.relmap-key {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.relmap-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+.relmap-body {
+  flex: 1;
+  overflow: auto;
+  padding: 1rem;
+}
+.relmap-svg {
+  width: 100%;
+  max-width: 960px;
+  display: block;
+  margin: 0 auto;
+}
+.relmap-node {
+  cursor: pointer;
+}
+.relmap-node circle {
+  fill: #2a2824;
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+.relmap-node:hover circle {
+  fill: #3a362f;
+}
+.relmap-node text {
+  fill: var(--ink);
+  font-family: var(--ui-font);
+  font-size: 12px;
+}
+.relmap-node .relmap-initial {
+  fill: var(--accent);
+  font-weight: 700;
+  font-size: 13px;
+}
+.relmap-cards {
+  max-width: 960px;
+  margin: 1rem auto 0;
+}
+.relmap-cards-title {
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+.relmap-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 0.7rem;
+}
+.relmap-card {
+  background: #201f1b;
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--ink);
+}
+.relmap-card-head {
+  display: flex;
+  gap: 0.3rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.relmap-card-type {
+  margin-left: auto;
+  font-size: 0.72rem;
+}
+.relmap-card-note {
+  color: var(--muted);
+  margin-top: 0.3rem;
+}

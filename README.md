@@ -23,7 +23,9 @@ Lo que ya funciona:
 - **Interfaz tipo ribbon** con pestañas **Inicio** (portapapeles, elemento desplegable, fuente: negrita/cursiva/subrayado/tachado, portada, archivo, páginas/PDF) y **Edición** (revisiones).
 - **Modo revisión** (pestaña **Edición**): elige un color y la **selección actual** queda sombreada al instante (con una barra de color a la izquierda); lo que sigas editando también se marca. Visible en editor, vista previa y PDF.
 - **Escaleta y navegador de escenas** (grupo **Esquema** en Inicio): barra lateral que lista las escenas y salta a ellas, y una **escaleta de tarjetas** (una por escena) con resumen editable y **reordenado por arrastre** que reacomoda el guion.
-- **Personajes y reportes** (grupo **Esquema** → **Personajes**): tablero con el reparto detectado automáticamente, con parlamentos, escenas y palabras por personaje, ficha editable y salto a su primera intervención.
+- **Personajes y reportes** (grupo **Esquema** → **Personajes**): tablero con el reparto detectado automáticamente (parlamentos, escenas, palabras), salto a su primera intervención, y **biblia de personaje** por cada uno.
+- **Biblia de personaje**: foto, alias, logline, actor, datos básicos (selects), apariencia, biografía en 3 etapas + experiencia previa + evento desencadenante + miscelánea con preguntas, deseo/necesidad, psicología, arco, auto/percepción externa, brújula (función dramática, energía/tono, perfil de voz), **medidores y rasgos con sliders 1–100**, reacciones ante sentimientos, y **tarjetas de relaciones**. Todo se guarda localmente.
+- **Mapa relacional**: grafo de personajes con aristas de color por tipo de relación (familia, romance, conflicto…) y tarjetas de relaciones.
 - **Modo noche, deshacer/rehacer y ortografía** en la pestaña Inicio (grupos Historial y Vista).
 - **Control de versiones** (Herramientas → **Versiones**): guarda borradores con nombre y fecha, y **compara** cualquiera contra el guion actual con un diff línea a línea (añadidos/eliminados); permite restaurar.
 - **Buscar y reemplazar** (Herramientas): por tipo de elemento, con may/min, palabra completa y **expresiones regulares**.

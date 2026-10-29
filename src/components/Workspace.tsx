@@ -22,8 +22,9 @@ import { jumpToScene, setSceneSummary, reorderScenes } from "../editor/sceneOps"
 import { SceneNavigator } from "./SceneNavigator";
 import { BeatBoard } from "./BeatBoard";
 import { getCharacters, CharacterStat } from "../lib/characters";
-import { loadCharacterNotes, saveCharacterNote, CharacterNotes } from "../lib/characterNotes";
 import { CharacterBoard } from "./CharacterBoard";
+import { CharacterBio } from "./CharacterBio";
+import { RelationMap } from "./RelationMap";
 import { loadVersions, saveVersion, deleteVersion, Version } from "../lib/versions";
 import { VersionsPanel } from "./VersionsPanel";
 import { countMatches, replaceAll, findNext, FindOptions } from "../editor/findReplace";
@@ -76,7 +77,8 @@ export function Workspace() {
   const [showBeat, setShowBeat] = useState(false);
   const [showChars, setShowChars] = useState(false);
   const [chars, setChars] = useState<CharacterStat[]>([]);
-  const [charNotes, setCharNotes] = useState<CharacterNotes>({});
+  const [bioName, setBioName] = useState<string | null>(null);
+  const [showMap, setShowMap] = useState(false);
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
   const [night, setNight] = useState(() => localStorage.getItem("claqueta:tema") === "noche");
@@ -271,13 +273,7 @@ export function Workspace() {
     const view = viewRef.current;
     if (!view) return;
     setChars(getCharacters(view.state.doc));
-    setCharNotes(loadCharacterNotes());
     setShowChars(true);
-  }, []);
-
-  const editCharNote = useCallback((name: string, text: string) => {
-    saveCharacterNote(name, text);
-    setCharNotes((prev) => ({ ...prev, [name]: text }));
   }, []);
 
   const doUndo = useCallback(() => run(undo), [run]);
@@ -456,10 +452,26 @@ export function Workspace() {
       {showChars && (
         <CharacterBoard
           characters={chars}
-          notes={charNotes}
-          onEditNote={editCharNote}
+          onOpenBio={(name) => setBioName(name)}
+          onOpenMap={() => setShowMap(true)}
           onJump={goToScene}
           onClose={() => setShowChars(false)}
+        />
+      )}
+
+      {bioName && (
+        <CharacterBio
+          name={bioName}
+          allNames={chars.map((c) => c.name)}
+          onClose={() => setBioName(null)}
+        />
+      )}
+
+      {showMap && (
+        <RelationMap
+          names={chars.map((c) => c.name)}
+          onOpenBio={(name) => setBioName(name)}
+          onClose={() => setShowMap(false)}
         />
       )}
 
