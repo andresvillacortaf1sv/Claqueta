@@ -47,6 +47,8 @@ interface Props {
   onBreakdown: () => void;
   onNeural: () => void;
   onAnalysis: () => void;
+  onConceptBoard: () => void;
+  onDirection: () => void;
 }
 
 function Group({ label, children }: { label: string; children: ReactNode }) {
@@ -266,6 +268,14 @@ export function Ribbon(props: Props) {
               </button>
               <button className="rb-btn" onClick={props.onAnalysis} title="Análisis del guion (métricas + IA)">
                 Análisis
+              </button>
+              <button className="rb-btn" onClick={props.onConceptBoard} title="Mapas, notas y líneas de tiempo">
+                Pizarra
+              </button>
+            </Group>
+            <Group label="Dirección">
+              <button className="rb-btn rb-btn-primary" onClick={props.onDirection} title="Desglose técnico, storyboard y lista de planos">
+                Dirección
               </button>
             </Group>
           </>

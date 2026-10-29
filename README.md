@@ -28,6 +28,8 @@ Lo que ya funciona:
 - **Mapa relacional**: grafo de personajes con aristas de color por tipo de relación (familia, romance, conflicto…) y tarjetas de relaciones.
 - **Red neuronal** (Herramientas → Análisis): grafo estructural del guion (escenas, personajes, lugares, objetos) con disposición por fuerzas, capas on/off, arrastre de nodos, zoom y salto a la escena.
 - **Análisis del guion** (Herramientas → Análisis): resumen del arco, timeline de métricas (intensidad/atención/tensión), paleta de emociones y mapa estructural (Setup→Desenlace). Funciona por **métricas** sin IA, y con **IA "trae tu propia clave"** (Anthropic / OpenRouter / Ollama / OpenAI-compatible) para emociones y resumen.
+- **Pizarra conceptual** (Herramientas → Pizarra): lienzo libre con tarjetas (ideas, notas, hitos) arrastrables, conexiones entre ellas y modo **línea de tiempo** que ordena los hitos. Varias pizarras, guardado local.
+- **Dirección** (Herramientas → Dirección): **desglose técnico** por departamentos (arte, vestuario, sonido, efectos, VFX, fotografía…) con notas y estado por escena, **storyboard** por escena (imagen + descripción) y **lista de planos** (tipo, cámara, lente, ángulo, movimiento, duración, sujeto, filmado).
 - **Modo noche, deshacer/rehacer y ortografía** en la pestaña Inicio (grupos Historial y Vista).
 - **Control de versiones** (Herramientas → **Versiones**): guarda borradores con nombre y fecha, y **compara** cualquiera contra el guion actual con un diff línea a línea (añadidos/eliminados); permite restaurar.
 - **Buscar y reemplazar** (Herramientas): por tipo de elemento, con may/min, palabra completa y **expresiones regulares**.

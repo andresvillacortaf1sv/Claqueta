@@ -36,6 +36,8 @@ import { Breakdown } from "./Breakdown";
 import { buildGraph, Graph } from "../lib/graph";
 import { NeuralMap } from "./NeuralMap";
 import { AnalysisPanel } from "./AnalysisPanel";
+import { ConceptBoard } from "./ConceptBoard";
+import { Direction } from "./Direction";
 import {
   ElementType,
   ELEMENT_LABELS,
@@ -95,6 +97,8 @@ export function Workspace() {
   const [bdData, setBdData] = useState<BreakdownData>({});
   const [neuralGraph, setNeuralGraph] = useState<Graph | null>(null);
   const [showAnalysis, setShowAnalysis] = useState(false);
+  const [showConcept, setShowConcept] = useState(false);
+  const [dirScenes, setDirScenes] = useState<SceneBreakdown[] | null>(null);
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -364,6 +368,12 @@ export function Workspace() {
     setNeuralGraph(buildGraph(view.state.doc, loadBreakdown()));
   }, []);
 
+  const openDirection = useCallback(() => {
+    const view = viewRef.current;
+    if (!view) return;
+    setDirScenes(getSceneBreakdown(view.state.doc));
+  }, []);
+
   // Atajos tipo Final Draft: Ctrl/Cmd + número para fijar el elemento.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -415,6 +425,8 @@ export function Workspace() {
         onBreakdown={openBreakdown}
         onNeural={openNeural}
         onAnalysis={() => setShowAnalysis(true)}
+        onConceptBoard={() => setShowConcept(true)}
+        onDirection={openDirection}
       />
 
       <div className="editor-area">
@@ -527,6 +539,12 @@ export function Workspace() {
 
       {showAnalysis && (
         <AnalysisPanel getBlocks={currentBlocks} onClose={() => setShowAnalysis(false)} />
+      )}
+
+      {showConcept && <ConceptBoard onClose={() => setShowConcept(false)} />}
+
+      {dirScenes && (
+        <Direction scenes={dirScenes} onJump={goToScene} onClose={() => setDirScenes(null)} />
       )}
     </div>
   );

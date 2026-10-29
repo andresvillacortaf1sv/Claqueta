@@ -1557,3 +1557,94 @@ body {
   border-right: 1px solid rgba(0, 0, 0, 0.3);
 }
 .ai-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 0.8rem; line-height: 1.4; }
+
+/* ---------- Pizarra conceptual ---------- */
+.cb-boardsel {
+  font-family: var(--ui-font); font-size: 0.8rem; color: var(--ink);
+  background: #1b1a17; border: 1px solid var(--bar-line); border-radius: 6px; padding: 0.3rem 0.45rem;
+}
+.cb-modes { display: flex; gap: 0.3rem; margin-left: auto; }
+.cb-modes button {
+  font-size: 0.8rem; color: var(--muted); background: transparent;
+  border: 1px solid transparent; border-radius: 6px; padding: 0.3rem 0.6rem; cursor: pointer;
+}
+.cb-modes button.is-on { color: var(--accent); background: var(--accent-soft); border-color: rgba(200,128,58,0.4); }
+.cb-toolbar {
+  display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem;
+  background: var(--bar); border-bottom: 1px solid var(--bar-line);
+}
+.cb-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 0.15rem; }
+.cb-hint { color: var(--muted); font-size: 0.76rem; margin-left: 0.5rem; }
+.cb-surface {
+  flex: 1; position: relative; overflow: auto;
+  background: radial-gradient(circle, #26241f 1px, transparent 1px) 0 0 / 22px 22px, #1a1917;
+  touch-action: none;
+}
+.cb-edges { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.cb-card {
+  position: absolute; width: 180px;
+  background: #24221e; border: 1px solid var(--bar-line); border-top: 3px solid var(--accent);
+  border-radius: 8px; padding: 0.4rem; box-shadow: 0 6px 16px rgba(0,0,0,0.4); cursor: grab;
+}
+.cb-card.is-connecting { outline: 2px solid var(--accent); }
+.cb-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem; }
+.cb-kind { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.03em; }
+.cb-card-actions button {
+  background: transparent; border: 0; color: var(--muted); cursor: pointer; font-size: 0.9rem; padding: 0 0.15rem;
+}
+.cb-date, .cb-text {
+  width: 100%; font-family: var(--ui-font); color: var(--ink);
+  background: #1b1a17; border: 1px solid var(--bar-line); border-radius: 5px; padding: 0.3rem; margin-bottom: 0.2rem;
+}
+.cb-date { font-size: 0.74rem; }
+.cb-text { font-size: 0.8rem; resize: vertical; min-height: 48px; }
+.cb-empty { position: absolute; top: 40%; left: 0; right: 0; text-align: center; color: var(--muted-dim); font-size: 0.85rem; padding: 1rem; }
+.cb-timeline { flex: 1; overflow: auto; padding: 2rem; }
+.cb-tl-track { display: flex; flex-direction: column; gap: 0; border-left: 2px solid var(--bar-line); margin-left: 1rem; }
+.cb-tl-item { position: relative; padding: 0 0 1.4rem 1.5rem; }
+.cb-tl-dot { position: absolute; left: -7px; top: 2px; width: 12px; height: 12px; border-radius: 50%; }
+.cb-tl-date { font-size: 0.74rem; color: var(--accent); margin-bottom: 0.2rem; }
+.cb-tl-card { background: #24221e; border: 1px solid var(--bar-line); border-radius: 8px; padding: 0.5rem 0.7rem; color: var(--ink); font-size: 0.85rem; }
+
+/* ---------- Dirección ---------- */
+.dir-body { flex: 1; display: flex; min-height: 0; }
+.dir-scenes { flex: 0 0 240px; overflow-y: auto; background: var(--desk-2); border-right: 1px solid var(--bar-line); }
+.dir-scene {
+  display: flex; align-items: center; gap: 0.5rem; width: 100%; text-align: left;
+  background: transparent; border: 0; border-bottom: 1px solid var(--bar-line);
+  padding: 0.55rem 0.6rem; color: var(--ink); cursor: pointer; font-family: var(--ui-font); font-size: 0.8rem;
+}
+.dir-scene:hover { background: #2c2a27; }
+.dir-scene.is-sel { background: var(--accent-soft); }
+.dir-scene-num { color: var(--muted-dim); font-size: 0.72rem; min-width: 1.3rem; }
+.dir-scene-head { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dir-scene-badge { font-size: 0.68rem; color: var(--accent); background: var(--accent-soft); border-radius: 10px; padding: 0 0.4rem; }
+.dir-main { flex: 1; overflow: auto; padding: 1.2rem; }
+.dir-title { font-family: var(--script-font); text-transform: uppercase; font-size: 0.95rem; color: var(--ink); margin: 0 0 1rem; }
+.dir-dept { background: #1b1a18; border: 1px solid var(--bar-line); border-radius: 8px; padding: 0.6rem; margin-bottom: 0.7rem; }
+.dir-dept-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
+.dir-dept-name { color: var(--ink); font-size: 0.85rem; font-weight: 500; }
+.dir-status, .dir-shot-grid select, .dir-shot-grid input {
+  font-family: var(--ui-font); font-size: 0.8rem; color: var(--ink);
+  background: #1b1a17; border: 1px solid var(--bar-line); border-radius: 6px; padding: 0.3rem 0.45rem;
+}
+.dir-note {
+  width: 100%; min-height: 54px; resize: vertical; font-family: var(--ui-font); font-size: 0.82rem; color: var(--ink);
+  background: #1b1a17; border: 1px solid var(--bar-line); border-radius: 6px; padding: 0.4rem;
+}
+.dir-story-frame {
+  width: 100%; max-width: 720px; aspect-ratio: 16/9; background: #141311;
+  border: 1px dashed var(--bar-line); border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; overflow: hidden; margin-bottom: 0.6rem;
+}
+.dir-story-frame img { width: 100%; height: 100%; object-fit: contain; }
+.dir-story-empty { color: var(--muted); }
+.dir-shots-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; }
+.dir-shot { background: #1b1a18; border: 1px solid var(--bar-line); border-radius: 8px; padding: 0.7rem; margin-bottom: 0.8rem; }
+.dir-shot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.5rem; margin-bottom: 0.5rem; }
+.dir-shot-grid label { display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.7rem; color: var(--muted); }
+.dir-shot-wide { grid-column: span 2; }
+.dir-shot-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; }
+.dir-shot-done { display: flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; color: var(--ink); }
+.dir-shot-del { background: transparent; border: 1px solid var(--bar-line); color: var(--muted); border-radius: 5px; padding: 0.25rem 0.5rem; cursor: pointer; font-size: 0.76rem; }
+.dir-shot-del:hover { color: #d9705f; }
