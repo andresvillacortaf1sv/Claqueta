@@ -27,6 +27,8 @@ const STRIP_META: Record<StripKind, { label: string; color: string }> = {
 export function ShootSchedule({ scenes, onClose, embedded }: Props) {
   const [sched, setSched] = useState<Schedule>(() => loadSchedule());
   const [dragScene, setDragScene] = useState<number | null>(null);
+  const [dragStrip, setDragStrip] = useState<{ dayId: string; stripId: string } | null>(null);
+  const [overStrip, setOverStrip] = useState<string | null>(null);
 
   useEffect(() => {
     const t = setTimeout(() => saveSchedule(sched), 400);
@@ -67,10 +69,35 @@ export function ShootSchedule({ scenes, onClose, embedded }: Props) {
   const setStripText = (dayId: string, stripId: string, text: string) =>
     updateDay(dayId, (d) => ({ ...d, strips: d.strips.map((s) => (s.id === stripId ? { ...s, text } : s)) }));
 
+  // Reordenar una tira dentro de su día soltándola sobre otra.
+  const reorderStrip = (dayId: string, targetStripId: string) => {
+    if (!dragStrip || dragStrip.dayId !== dayId || dragStrip.stripId === targetStripId) {
+      setDragStrip(null);
+      setOverStrip(null);
+      return;
+    }
+    updateDay(dayId, (d) => {
+      const arr = [...d.strips];
+      const from = arr.findIndex((s) => s.id === dragStrip.stripId);
+      const to = arr.findIndex((s) => s.id === targetStripId);
+      if (from === -1 || to === -1) return d;
+      const [moved] = arr.splice(from, 1);
+      arr.splice(to, 0, moved);
+      return { ...d, strips: arr };
+    });
+    setDragStrip(null);
+    setOverStrip(null);
+  };
+
   const sceneLabel = (i: number) => {
     const s = scenes[i];
     return s ? `${i}. ${s.heading}` : `Escena ${i}`;
   };
+
+  async function exportPDF() {
+    const { exportSchedulePDF } = await import("../lib/directionPdf");
+    exportSchedulePDF(scenes, sched);
+  }
 
   const content = (
     <>
@@ -79,7 +106,10 @@ export function ShootSchedule({ scenes, onClose, embedded }: Props) {
           <button className="btn-primary" onClick={addDay}>
             + Día
           </button>
-          <span className="beatboard-hint">Arrastra las escenas sin asignar a un día</span>
+          <span className="beatboard-hint">Arrastra escenas a un día; reordénalas dentro del día</span>
+          <button className="btn-ghost sch-embed-pdf" onClick={exportPDF}>
+            ⤓ PDF
+          </button>
         </div>
       )}
       <div className="sch-body">
@@ -135,8 +165,16 @@ export function ShootSchedule({ scenes, onClose, embedded }: Props) {
                     key={s.id}
                     strip={s}
                     sceneLabel={sceneLabel}
+                    isOver={overStrip === s.id}
                     onText={(t) => setStripText(day.id, s.id, t)}
                     onRemove={() => removeStrip(day.id, s.id)}
+                    onDragStart={() => setDragStrip({ dayId: day.id, stripId: s.id })}
+                    onDragOver={() => dragStrip && setOverStrip(s.id)}
+                    onDrop={() => reorderStrip(day.id, s.id)}
+                    onDragEnd={() => {
+                      setDragStrip(null);
+                      setOverStrip(null);
+                    }}
                   />
                 ))}
                 {day.strips.length === 0 && <div className="sch-day-empty">Arrastra escenas aquí.</div>}
@@ -161,6 +199,9 @@ export function ShootSchedule({ scenes, onClose, embedded }: Props) {
           + Día
         </button>
         <span className="beatboard-hint">Arrastra las escenas sin asignar a un día</span>
+        <button className="btn-ghost" onClick={exportPDF}>
+          ⤓ PDF
+        </button>
         <button className="btn-ghost" onClick={onClose}>
           Cerrar
         </button>
@@ -173,20 +214,49 @@ export function ShootSchedule({ scenes, onClose, embedded }: Props) {
 function Stripe({
   strip,
   sceneLabel,
+  isOver,
   onText,
   onRemove,
+  onDragStart,
+  onDragOver,
+  onDrop,
+  onDragEnd,
 }: {
   strip: Strip;
   sceneLabel: (i: number) => string;
+  isOver: boolean;
   onText: (t: string) => void;
   onRemove: () => void;
+  onDragStart: () => void;
+  onDragOver: () => void;
+  onDrop: () => void;
+  onDragEnd: () => void;
 }) {
   const meta = STRIP_META[strip.kind];
   return (
-    <div className="sch-strip" style={{ borderLeftColor: meta.color }}>
+    <div
+      className={"sch-strip" + (isOver ? " is-over" : "")}
+      style={{ borderLeftColor: meta.color }}
+      draggable
+      onDragStart={(e) => {
+        e.stopPropagation();
+        onDragStart();
+      }}
+      onDragOver={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onDragOver();
+      }}
+      onDrop={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onDrop();
+      }}
+      onDragEnd={onDragEnd}
+    >
       <div className="sch-strip-head">
         <span className="sch-strip-kind" style={{ color: meta.color }}>
-          {meta.label}
+          <span className="sch-grip">⠿</span> {meta.label}
         </span>
         <button className="sch-strip-x" onClick={onRemove}>
           ×

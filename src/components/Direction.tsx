@@ -79,6 +79,15 @@ export function Direction({ scenes, onJump, onClose }: Props) {
     }
   }
 
+  async function exportDesglose() {
+    const { exportBreakdownPDF } = await import("../lib/directionPdf");
+    exportBreakdownPDF(scenes, data);
+  }
+  async function exportPlanos() {
+    const { exportShotListPDF } = await import("../lib/directionPdf");
+    exportShotListPDF(scenes, data);
+  }
+
   const addShot = () => updateScene({ shots: [...ds.shots, emptyShot(ds.shots.length + 1)] });
   const updateShot = (id: string, patch: Partial<Shot>) =>
     updateScene({ shots: ds.shots.map((s) => (s.id === id ? { ...s, ...patch } : s)) });
@@ -102,6 +111,16 @@ export function Direction({ scenes, onJump, onClose }: Props) {
             Plan de rodaje
           </button>
         </div>
+        {tab === "desglose" && (
+          <button className="btn-ghost" onClick={exportDesglose}>
+            ⤓ PDF
+          </button>
+        )}
+        {tab === "planos" && (
+          <button className="btn-ghost" onClick={exportPlanos}>
+            ⤓ PDF
+          </button>
+        )}
         <button className="btn-ghost" onClick={() => { onJump(scene.pos); onClose(); }}>
           Ir a la escena
         </button>

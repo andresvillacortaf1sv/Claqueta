@@ -9,8 +9,20 @@
   --paper: #fbfaf7;
   --paper-ink: #17171a;
   --accent: #c8803a;
+  --accent-2: #d99a55;
   --accent-soft: rgba(200, 128, 58, 0.16);
   --ok: #7fae6b;
+  --danger: #d9705f;
+
+  --panel: #201f1b;
+  --panel-2: #24221e;
+  --field: #1b1a17;
+
+  --radius: 8px;
+  --radius-lg: 12px;
+  --shadow-pop: 0 14px 40px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 6px 18px rgba(0, 0, 0, 0.35);
+  --t-fast: 0.12s ease;
 
   --ui-font: "Inter", system-ui, -apple-system, sans-serif;
   --script-font: "Courier Prime", "Courier New", monospace;
@@ -18,6 +30,38 @@
 
 * {
   box-sizing: border-box;
+}
+
+/* Scrollbars discretas y consistentes en toda la app */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #45423c transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #45423c;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: #565249;
+  background-clip: padding-box;
+}
+
+/* Entrada suave de los paneles a pantalla completa */
+@keyframes claqueta-pop {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 html,
@@ -276,14 +320,16 @@ body {
   align-items: center;
   justify-content: center;
   background: rgba(8, 8, 7, 0.72);
+  backdrop-filter: blur(2px);
+  animation: claqueta-pop 0.14s ease both;
 }
 .modal {
   width: min(92vw, 460px);
-  background: #24221e;
+  background: var(--panel-2);
   border: 1px solid var(--bar-line);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   padding: 1.2rem 1.3rem;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  box-shadow: var(--shadow-pop);
 }
 .modal-title {
   margin: 0 0 1rem;
@@ -569,19 +615,35 @@ body {
   z-index: 55;
   display: flex;
   flex-direction: column;
-  background: rgba(14, 13, 12, 0.97);
+  background: rgba(14, 13, 12, 0.985);
+  backdrop-filter: blur(2px);
+  animation: claqueta-pop 0.16s ease both;
 }
 .beatboard-bar {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 0.6rem 1rem;
-  background: var(--bar);
+  gap: 0.7rem;
+  padding: 0.55rem 1rem;
+  background: linear-gradient(to bottom, #1f1e1b, var(--bar));
   border-bottom: 1px solid var(--bar-line);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
 }
 .beatboard-count {
   color: var(--ink);
-  font-size: 0.85rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding-right: 0.3rem;
+}
+.beatboard-count::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-right: 0.5rem;
+  vertical-align: middle;
 }
 .beatboard-hint {
   color: var(--muted);
@@ -729,31 +791,49 @@ body {
 .btn-primary {
   font-family: var(--ui-font);
   font-size: 0.8rem;
-  font-weight: 500;
+  font-weight: 600;
   color: #1a1407;
-  background: var(--accent);
+  background: linear-gradient(to bottom, var(--accent-2), var(--accent));
   border: 1px solid var(--accent);
-  border-radius: 6px;
-  padding: 0.38rem 0.75rem;
+  border-radius: var(--radius);
+  padding: 0.4rem 0.8rem;
   cursor: pointer;
-  transition: filter 0.12s;
+  transition: filter var(--t-fast), transform var(--t-fast);
 }
 .btn-primary:hover {
-  filter: brightness(1.08);
+  filter: brightness(1.07);
+}
+.btn-primary:active {
+  transform: translateY(1px);
 }
 
 .btn-ghost {
   font-family: var(--ui-font);
   font-size: 0.8rem;
   color: var(--ink);
-  background: transparent;
+  background: #262420;
   border: 1px solid var(--bar-line);
-  border-radius: 6px;
-  padding: 0.38rem 0.75rem;
+  border-radius: var(--radius);
+  padding: 0.4rem 0.8rem;
   cursor: pointer;
+  transition: background var(--t-fast), border-color var(--t-fast);
 }
 .btn-ghost:hover {
-  background: #2c2a27;
+  background: #322f2a;
+  border-color: #46433d;
+}
+.btn-ghost:active {
+  transform: translateY(1px);
+}
+
+/* Foco accesible y consistente en controles */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
 }
 
 /* ---------- Vista previa paginada ---------- */
@@ -1725,3 +1805,45 @@ body {
 }
 .sch-day-empty { color: var(--muted-dim); font-size: 0.78rem; text-align: center; padding: 0.8rem; }
 .sch-no-days { margin: auto; }
+
+/* ---------- Pase de interfaz v0.13 ---------- */
+/* Tarjetas de papel con leve elevación al pasar el cursor */
+.beat-card, .char-card, .bd-sheet {
+  transition: transform var(--t-fast), box-shadow var(--t-fast);
+}
+.beat-card:hover, .char-card:hover, .bd-sheet:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.42);
+}
+.char-card { display: flex; flex-direction: column; }
+.char-stats { min-height: 1.1rem; }
+
+/* Grip y resaltado al reordenar tiras del plan de rodaje */
+.sch-grip { cursor: grab; opacity: 0.5; letter-spacing: -2px; margin-right: 0.1rem; }
+.sch-strip { transition: box-shadow var(--t-fast), transform var(--t-fast); }
+.sch-strip.is-over { box-shadow: 0 0 0 2px var(--accent); transform: translateY(-1px); }
+.sch-embed-pdf { margin-left: auto; }
+
+/* Botones del ribbon: micro-interacción */
+.rb-btn, .rb-tgl, .el-btn { transition: background var(--t-fast), color var(--t-fast), border-color var(--t-fast); }
+.rb-btn:active:not(:disabled), .btn-ghost:active { transform: translateY(1px); }
+
+/* Campos de formulario: foco coherente */
+.bio-input, .bio-select, .bio-area, .dir-note, .dir-status,
+.findrep-input, .versions-save input, .cb-text, .cb-date,
+.sch-strip-input, .dev-field input, .dev-field textarea {
+  transition: border-color var(--t-fast), box-shadow var(--t-fast);
+}
+.dir-note:focus, .cb-text:focus, .sch-strip-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+/* Pestañas internas (desglose/dirección/análisis) más legibles */
+.bd-tabs button, .dir-scene, .nm-layer { transition: background var(--t-fast), color var(--t-fast); }
+
+/* Estados vacíos más amables */
+.beat-empty, .cb-empty, .sch-un-empty, .sch-day-empty {
+  line-height: 1.5;
+}

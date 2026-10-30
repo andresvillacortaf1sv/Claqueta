@@ -32,6 +32,8 @@ Lo que ya funciona:
 - **Dirección** (Herramientas → Dirección): **desglose técnico** por departamentos (con posibilidad de **añadir departamentos propios** y ver el texto de la escena actual), **storyboard** por escena (imagen + descripción), **lista de planos** y **plan de rodaje** (días con fecha, escenas arrastrables, comida/move/nota).
 - **Desarrollo** (Inicio → Documento → Desarrollo): logline, tagline, sinopsis y tratamiento, guardado local.
 - Personajes **añadibles manualmente** (sin haber escrito el guion). La **pizarra** admite tarjetas de **imagen**.
+- **Exportación a PDF** del desglose técnico, la lista de planos y el plan de rodaje (botón ⤓ PDF en cada vista de Dirección).
+- En el plan de rodaje, las tiras se **reordenan dentro del día** arrastrándolas.
 - **Modo noche, deshacer/rehacer y ortografía** en la pestaña Inicio (grupos Historial y Vista).
 - **Control de versiones** (Herramientas → **Versiones**): guarda borradores con nombre y fecha, y **compara** cualquiera contra el guion actual con un diff línea a línea (añadidos/eliminados); permite restaurar.
 - **Buscar y reemplazar** (Herramientas): por tipo de elemento, con may/min, palabra completa y **expresiones regulares**.
