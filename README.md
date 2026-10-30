@@ -53,6 +53,17 @@ npm run dev
 
 Se abre en `http://localhost:5173`.
 
+### App de escritorio (Tauri)
+
+Claqueta también se empaqueta como app nativa de escritorio (Windows, macOS,
+Linux) con Tauri 2 — sin navegador y sin conexión. Ver **[DESKTOP.md](./DESKTOP.md)**
+para los requisitos y el paso a paso. En resumen (con Node y Rust instalados):
+
+```bash
+npm run desktop         # ventana nativa con recarga en vivo
+npm run desktop:build   # genera el instalable en src-tauri/target/release/bundle/
+```
+
 Para compilar a producción:
 
 ```bash

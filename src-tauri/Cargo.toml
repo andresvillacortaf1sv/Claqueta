@@ -1,0 +1,26 @@
+[package]
+name = "claqueta"
+version = "0.13.0"
+description = "Editor de guiones profesional, open-source y local-first"
+authors = ["Andres"]
+edition = "2021"
+rust-version = "1.77.2"
+
+# El binario de la app. src-tauri/src/main.rs es el punto de entrada.
+[[bin]]
+name = "claqueta"
+path = "src/main.rs"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-opener = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[features]
+# Las apps de producción no deben tener habilitado `custom-protocol`.
+# Tauri lo gestiona por ti, pero aquí se documenta.
+custom-protocol = ["tauri/custom-protocol"]
