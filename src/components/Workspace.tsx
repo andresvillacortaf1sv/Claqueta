@@ -550,7 +550,7 @@ export function Workspace() {
         </div>
       </div>
 
-      <NotesMargin notes={marginNotes} onOpen={openNoteById} />
+      <NotesMargin notes={marginNotes} onOpen={openNoteById} onDelete={deleteNote} />
 
       <StatusBar
         current={current}

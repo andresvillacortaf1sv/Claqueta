@@ -1995,3 +1995,22 @@ a:focus-visible {
   -webkit-line-clamp: 5;
   -webkit-box-orient: vertical;
 }
+.margin-note-del {
+  flex: 0 0 auto;
+  align-self: flex-start;
+  width: 16px;
+  height: 16px;
+  line-height: 14px;
+  text-align: center;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  color: var(--muted);
+  font-size: 14px;
+  cursor: pointer;
+}
+.margin-note-del:hover {
+  background: rgba(217, 112, 95, 0.2);
+  color: var(--danger);
+}
