@@ -50,6 +50,8 @@ interface Props {
   onConceptBoard: () => void;
   onDirection: () => void;
   onDevelopment: () => void;
+  onAddNote: () => void;
+  onDialogueExt: (ext: string) => void;
 }
 
 function Group({ label, children }: { label: string; children: ReactNode }) {
@@ -163,6 +165,18 @@ export function Ribbon(props: Props) {
               </button>
             </Group>
 
+            <Group label="Diálogo">
+              <button className="rb-btn" onClick={() => props.onDialogueExt("V.O.")} title="Añadir (V.O.) al personaje">
+                (V.O.)
+              </button>
+              <button className="rb-btn" onClick={() => props.onDialogueExt("O.S.")} title="Añadir (O.S.) al personaje">
+                (O.S.)
+              </button>
+              <button className="rb-btn" onClick={() => props.onDialogueExt("CONT'D")} title="Añadir (CONT'D) al personaje">
+                (CONT'D)
+              </button>
+            </Group>
+
             <Group label="Vista">
               <button
                 className={"rb-btn" + (props.night ? " is-on" : "")}
@@ -177,6 +191,9 @@ export function Ribbon(props: Props) {
                 title="Revisión de ortografía"
               >
                 Ortografía
+              </button>
+              <button className="rb-btn" onClick={props.onAddNote} title="Añadir una nota en el margen">
+                📝 Nota
               </button>
             </Group>
 

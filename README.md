@@ -34,6 +34,7 @@ Lo que ya funciona:
 - Personajes **añadibles manualmente** (sin haber escrito el guion). La **pizarra** admite tarjetas de **imagen**.
 - **Exportación a PDF** del desglose técnico, la lista de planos y el plan de rodaje (botón ⤓ PDF en cada vista de Dirección).
 - En el plan de rodaje, las tiras se **reordenan dentro del día** arrastrándolas.
+- **Guías de página estables** (sin saltos al escribir), **autocompletado de personajes**, **paréntesis automático**, **(CONT'D) automático** en el guion, **(V.O.)/(O.S.)** insertables desde la barra, **notas en el margen** y **sombreado gris en los encabezados**.
 - **Modo noche, deshacer/rehacer y ortografía** en la pestaña Inicio (grupos Historial y Vista).
 - **Control de versiones** (Herramientas → **Versiones**): guarda borradores con nombre y fecha, y **compara** cualquiera contra el guion actual con un diff línea a línea (añadidos/eliminados); permite restaurar.
 - **Buscar y reemplazar** (Herramientas): por tipo de elemento, con may/min, palabra completa y **expresiones regulares**.

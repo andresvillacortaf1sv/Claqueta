@@ -12,6 +12,16 @@
   outline: none;
   min-height: 9in;
   caret-color: var(--accent);
+  /* Guía de página fija: una línea tenue cada 9in de contenido (= una página
+     US Letter). Es puramente visual y NO usa JavaScript, así que escribir no
+     provoca ningún salto ni reflujo. */
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(9in - 1px),
+    rgba(0, 0, 0, 0.14) calc(9in - 1px),
+    rgba(0, 0, 0, 0.14) 9in
+  );
 }
 
 .ProseMirror ::selection {
@@ -25,9 +35,13 @@
 }
 .workspace.night .ProseMirror {
   color: #e8e4db;
-}
-.workspace.night .pm-pagebreak-label {
-  background: #1f1e1c;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(9in - 1px),
+    rgba(255, 255, 255, 0.12) calc(9in - 1px),
+    rgba(255, 255, 255, 0.12) 9in
+  );
 }
 
 /* Cada línea del guion */
@@ -37,12 +51,22 @@
   min-height: 1.15em;
 }
 
-/* Encabezado de escena: INT./EXT. ... - DÍA/NOCHE */
+/* Encabezado de escena: INT./EXT. ... - DÍA/NOCHE (con sombreado gris sutil) */
 .sp-scene-heading {
   text-transform: uppercase;
   font-weight: 700;
   margin-top: 1.5em;
   margin-bottom: 1em;
+  background: rgba(0, 0, 0, 0.06);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
+  border-radius: 2px;
+  padding: 0.1em 0.3em;
+  margin-left: -0.3em;
+  margin-right: -0.3em;
+}
+.workspace.night .sp-scene-heading {
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 .ProseMirror > .sp-scene-heading:first-child {
   margin-top: 0;
@@ -102,27 +126,31 @@
 .sp-el[data-rev="salmon"]    { background: rgba(232, 121, 90, 0.30);  box-shadow: inset 3px 0 0 #e8795a; }
 .sp-el[data-rev="cherry"]    { background: rgba(177, 34, 59, 0.26);   box-shadow: inset 3px 0 0 #b1223b; }
 
-/* Marcador de salto de página (alto 0: no desplaza el texto) */
-.pm-pagebreak {
-  position: relative;
-  height: 0;
+/* CONT'D automático (inyectado por el plugin, no editable) */
+.sp-contd {
+  color: inherit;
+  opacity: 0.85;
 }
-.pm-pagebreak::before {
-  content: "";
+
+/* Marcador de nota en el margen (fuera de la página) */
+.note-marker {
   position: absolute;
-  left: -1.5in;
-  right: -1in;
-  top: -0.55em;
-  border-top: 1px dashed #cbc4b8;
-}
-.pm-pagebreak-label {
-  position: absolute;
-  right: -1in;
-  top: -1.5em;
+  left: -0.95in;
+  width: 0.7in;
+  transform: translateY(-0.1em);
+  cursor: pointer;
   font-family: var(--ui-font);
-  font-size: 9px;
-  letter-spacing: 0.04em;
-  color: var(--accent, #b06a2e);
-  background: var(--paper, #fbfaf7);
-  padding: 0 0.3rem;
+  font-size: 10px;
+  color: var(--accent, #c8803a);
+  background: rgba(200, 128, 58, 0.14);
+  border: 1px solid rgba(200, 128, 58, 0.35);
+  border-radius: 4px;
+  padding: 1px 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+}
+.note-marker:hover {
+  background: rgba(200, 128, 58, 0.26);
 }

@@ -7,10 +7,13 @@ import { MarkType } from "prosemirror-model";
 import { schema } from "../editor/schema";
 import { screenplayKeymap, baseKeymapPlugin } from "../editor/keymap";
 import { screenplayInputRules } from "../editor/inputrules";
-import { paginationPlugin } from "../editor/pagination";
 import { revisionsPlugin, setRevisionMeta, clearRevisions, applyRevision } from "../editor/revisions";
+import { contdPlugin } from "../editor/contd";
+import { autocompletePlugin, autocompleteKeymap } from "../editor/autocomplete";
+import { notesPlugin, addNote, updateNote, removeNote, noteCoords, getNotes } from "../editor/notes";
+import { NoteEditor } from "./NoteEditor";
 import { cargarDocumento, guardarDocumento, docFromBlocks } from "../editor/document";
-import { setElement } from "../editor/commands";
+import { setElement, appendCharacterExtension } from "../editor/commands";
 import { downloadText, pickTextFile } from "../lib/files";
 import { blocksToFdx, fdxToBlocks } from "../lib/fdx";
 import { blocksToFountain, fountainToBlocks } from "../lib/fountain";
@@ -102,6 +105,7 @@ export function Workspace() {
   const [showConcept, setShowConcept] = useState(false);
   const [dirScenes, setDirScenes] = useState<SceneBreakdown[] | null>(null);
   const [showDev, setShowDev] = useState(false);
+  const [openNote, setOpenNote] = useState<{ id: string; left: number; top: number; text: string } | null>(null);
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -111,10 +115,19 @@ export function Workspace() {
       plugins: [
         history(),
         screenplayInputRules,
+        autocompleteKeymap, // antes del keymap de guion: intercepta Enter/Tab si hay sugerencias
         screenplayKeymap,
         baseKeymapPlugin,
-        paginationPlugin(),
         revisionsPlugin(),
+        contdPlugin(),
+        autocompletePlugin(),
+        notesPlugin((id) => {
+          const view = viewRef.current;
+          if (!view) return;
+          const c = noteCoords(view, id);
+          const note = getNotes(view.state).find((n) => n.id === id);
+          if (c && note) setOpenNote({ id, left: c.left, top: c.top, text: note.text });
+        }),
       ],
     });
 
@@ -171,6 +184,29 @@ export function Workspace() {
     (type: ElementType) => run(setElement(type)),
     [run],
   );
+
+  const addDialogueExt = useCallback((ext: string) => run(appendCharacterExtension(ext)), [run]);
+
+  const createNote = useCallback(() => {
+    const view = viewRef.current;
+    if (!view) return;
+    const id = addNote(view);
+    const c = noteCoords(view, id);
+    if (c) setOpenNote({ id, left: c.left, top: c.top, text: "" });
+    view.focus();
+  }, []);
+
+  const saveNote = useCallback((id: string, text: string) => {
+    const view = viewRef.current;
+    if (view) updateNote(view, id, text);
+    setOpenNote(null);
+  }, []);
+
+  const deleteNote = useCallback((id: string) => {
+    const view = viewRef.current;
+    if (view) removeNote(view, id);
+    setOpenNote(null);
+  }, []);
 
   const openPreview = useCallback(() => {
     const view = viewRef.current;
@@ -437,6 +473,8 @@ export function Workspace() {
         onConceptBoard={() => setShowConcept(true)}
         onDirection={openDirection}
         onDevelopment={() => setShowDev(true)}
+        onAddNote={createNote}
+        onDialogueExt={addDialogueExt}
       />
 
       <div className="editor-area">
@@ -559,6 +597,15 @@ export function Workspace() {
       )}
 
       {showDev && <DevelopmentModal onClose={() => setShowDev(false)} />}
+
+      {openNote && (
+        <NoteEditor
+          note={openNote}
+          onSave={saveNote}
+          onDelete={deleteNote}
+          onClose={() => setOpenNote(null)}
+        />
+      )}
     </div>
   );
 }

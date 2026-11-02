@@ -52,6 +52,22 @@ export function AISettings({ initial, onSave, onClose }: Props) {
           />
         </label>
 
+        {cfg.provider === "anthropic" && (
+          <label className="field">
+            <span>Workspace ID (opcional)</span>
+            <input
+              value={cfg.workspaceId ?? ""}
+              onChange={(e) => setCfg((c) => ({ ...c, workspaceId: e.target.value }))}
+              placeholder="Sólo si tu clave da error de workspace"
+            />
+            <small className="ai-hint">
+              Si ves el error «not scoped to a workspace», pega aquí el ID del workspace
+              (Anthropic Console → Settings → Workspaces), o usa una clave creada dentro de un
+              workspace.
+            </small>
+          </label>
+        )}
+
         <div className="modal-actions">
           <button className="btn-ghost" onClick={onClose}>
             Cancelar

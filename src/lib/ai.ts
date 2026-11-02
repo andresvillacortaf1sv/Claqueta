@@ -17,6 +17,7 @@ export interface AIConfig {
   baseURL: string;
   apiKey: string;
   model: string;
+  workspaceId?: string; // sólo Anthropic: para claves con ámbito de organización
 }
 
 const KEY = "claqueta:ia";
@@ -90,14 +91,16 @@ export function extractJson(text: string): any {
 }
 
 async function callAnthropic(cfg: AIConfig, user: string): Promise<string> {
+  const headers: Record<string, string> = {
+    "content-type": "application/json",
+    "x-api-key": cfg.apiKey,
+    "anthropic-version": "2023-06-01",
+    "anthropic-dangerous-direct-browser-access": "true",
+  };
+  if (cfg.workspaceId?.trim()) headers["anthropic-workspace-id"] = cfg.workspaceId.trim();
   const res = await fetch(`${cfg.baseURL.replace(/\/$/, "")}/v1/messages`, {
     method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-api-key": cfg.apiKey,
-      "anthropic-version": "2023-06-01",
-      "anthropic-dangerous-direct-browser-access": "true",
-    },
+    headers,
     body: JSON.stringify({
       model: cfg.model,
       max_tokens: 4000,

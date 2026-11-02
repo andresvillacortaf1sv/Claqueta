@@ -7,7 +7,7 @@
  *  - Shift-Tab → cicla hacia atrás.
  *  - setElement(tipo) → lo usa la barra de herramientas.
  */
-import { Command, EditorState, Transaction } from "prosemirror-state";
+import { Command, EditorState, Transaction, TextSelection } from "prosemirror-state";
 import { setBlockType } from "prosemirror-commands";
 import {
   ElementType,
@@ -23,10 +23,44 @@ function currentElement(state: EditorState): ElementType | null {
   return isElementType(name) ? name : null;
 }
 
-/** Cambia el tipo del/los bloque(s) seleccionado(s) a `type`. */
+/** Cambia el tipo del/los bloque(s) seleccionado(s) a `type`.
+ *  Caso especial: al pasar a PARÉNTESIS un bloque vacío, inserta "()" en la misma
+ *  transacción y deja el cursor dentro, como en los editores profesionales. */
 export function setElement(type: ElementType): Command {
-  return (state, dispatch) =>
-    setBlockType(nodeTypeFor(type))(state, dispatch);
+  return (state, dispatch) => {
+    const { $from, empty } = state.selection;
+
+    // Paréntesis sobre bloque vacío → cambiar tipo e insertar "()" en un solo paso.
+    if (type === "parenthetical" && empty && $from.parent.content.size === 0) {
+      if (dispatch) {
+        const before = $from.before();
+        const tr = state.tr.setNodeMarkup(before, nodeTypeFor("parenthetical"));
+        const inner = before + 1;
+        tr.insertText("()", inner);
+        tr.setSelection(TextSelection.create(tr.doc, inner + 1));
+        dispatch(tr.scrollIntoView());
+      }
+      return true;
+    }
+
+    return setBlockType(nodeTypeFor(type))(state, dispatch);
+  };
+}
+
+/** Añade una extensión (p. ej. " (V.O.)") al final del bloque PERSONAJE actual. */
+export function appendCharacterExtension(ext: string): Command {
+  return (state, dispatch) => {
+    const { $from } = state.selection;
+    if ($from.parent.type.name !== "character") return false;
+    const text = $from.parent.textContent;
+    if (new RegExp(`\\(${ext.replace(/[().]/g, "\\$&")}\\)`, "i").test(text)) return true; // ya está
+    if (dispatch) {
+      const end = $from.end();
+      const tr = state.tr.insertText(` (${ext})`, end);
+      dispatch(tr.scrollIntoView());
+    }
+    return true;
+  };
 }
 
 /**
@@ -50,7 +84,7 @@ export const smartEnter: Command = (state, dispatch) => {
   if (isEmpty) {
     const idx = EMPTY_ENTER_CYCLE.indexOf(current);
     const nextName = EMPTY_ENTER_CYCLE[(idx + 1) % EMPTY_ENTER_CYCLE.length];
-    return setBlockType(nodeTypeFor(nextName))(state, dispatch);
+    return setElement(nextName)(state, dispatch);
   }
 
   // (a) Línea con texto: partir y crear el siguiente elemento lógico.
@@ -72,8 +106,7 @@ function cycle(dir: 1 | -1): Command {
     if (!current) return false;
     const idx = TAB_CYCLE.indexOf(current);
     const nextIdx = (idx + dir + TAB_CYCLE.length) % TAB_CYCLE.length;
-    const nextType = nodeTypeFor(TAB_CYCLE[nextIdx]);
-    return setBlockType(nextType)(state, dispatch);
+    return setElement(TAB_CYCLE[nextIdx])(state, dispatch);
   };
 }
 
