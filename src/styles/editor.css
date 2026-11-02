@@ -132,25 +132,3 @@
   opacity: 0.85;
 }
 
-/* Marcador de nota en el margen (fuera de la página) */
-.note-marker {
-  position: absolute;
-  left: -0.95in;
-  width: 0.7in;
-  transform: translateY(-0.1em);
-  cursor: pointer;
-  font-family: var(--ui-font);
-  font-size: 10px;
-  color: var(--accent, #c8803a);
-  background: rgba(200, 128, 58, 0.14);
-  border: 1px solid rgba(200, 128, 58, 0.35);
-  border-radius: 4px;
-  padding: 1px 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  user-select: none;
-}
-.note-marker:hover {
-  background: rgba(200, 128, 58, 0.26);
-}

@@ -22,7 +22,7 @@ async function main() {
   const { setElement, appendCharacterExtension } = await import("../src/editor/commands");
 
   function mk(doc: any) {
-    const state = EditorState.create({ doc, plugins: [history(), screenplayInputRules, autocompleteKeymap, screenplayKeymap, baseKeymapPlugin, revisionsPlugin(), contdPlugin(), autocompletePlugin(), notesPlugin(()=>{})] });
+    const state = EditorState.create({ doc, plugins: [history(), screenplayInputRules, autocompleteKeymap, screenplayKeymap, baseKeymapPlugin, revisionsPlugin(), contdPlugin(), autocompletePlugin(), notesPlugin()] });
     return new EditorView(dom.window.document.getElementById("root")! as any, { state });
   }
 
@@ -75,8 +75,10 @@ async function main() {
     updateNote(view, id, "revisar esto");
     const notes = getNotes(view.state);
     check("nota creada y con texto", notes.length === 1 && notes[0].text === "revisar esto");
-    const markerHtml = (view.dom as HTMLElement).innerHTML;
-    check("marcador de nota renderizado", markerHtml.includes("note-marker"));
+    // La posición debe remapearse al editar el documento (la nota sigue al texto).
+    const posBefore = getNotes(view.state)[0].pos;
+    view.dispatch(view.state.tr.insertText("XX", 1));
+    check("posición de la nota se remapea al editar", getNotes(view.state)[0].pos === posBefore + 2);
     view.destroy();
   }
 

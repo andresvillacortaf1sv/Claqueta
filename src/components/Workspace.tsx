@@ -12,6 +12,7 @@ import { contdPlugin } from "../editor/contd";
 import { autocompletePlugin, autocompleteKeymap } from "../editor/autocomplete";
 import { notesPlugin, addNote, updateNote, removeNote, noteCoords, getNotes } from "../editor/notes";
 import { NoteEditor } from "./NoteEditor";
+import { NotesMargin, MarginNote } from "./NotesMargin";
 import { cargarDocumento, guardarDocumento, docFromBlocks } from "../editor/document";
 import { setElement, appendCharacterExtension } from "../editor/commands";
 import { downloadText, pickTextFile } from "../lib/files";
@@ -106,6 +107,9 @@ export function Workspace() {
   const [dirScenes, setDirScenes] = useState<SceneBreakdown[] | null>(null);
   const [showDev, setShowDev] = useState(false);
   const [openNote, setOpenNote] = useState<{ id: string; left: number; top: number; text: string } | null>(null);
+  const [marginNotes, setMarginNotes] = useState<MarginNote[]>([]);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const recomputeRef = useRef<() => void>(() => {});
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -121,13 +125,7 @@ export function Workspace() {
         revisionsPlugin(),
         contdPlugin(),
         autocompletePlugin(),
-        notesPlugin((id) => {
-          const view = viewRef.current;
-          if (!view) return;
-          const c = noteCoords(view, id);
-          const note = getNotes(view.state).find((n) => n.id === id);
-          if (c && note) setOpenNote({ id, left: c.left, top: c.top, text: note.text });
-        }),
+        notesPlugin(),
       ],
     });
 
@@ -149,6 +147,9 @@ export function Workspace() {
         setCanUndo(undoDepth(next) > 0);
         setCanRedo(redoDepth(next) > 0);
 
+        // Reposicionar las notas del margen tras cada cambio.
+        requestAnimationFrame(() => recomputeRef.current());
+
         if (tr.docChanged) {
           setScenes(getScenes(next.doc));
           setSave("guardando");
@@ -165,6 +166,7 @@ export function Workspace() {
     view.dom.setAttribute("spellcheck", String(spell));
     setScenes(getScenes(view.state.doc));
     view.focus();
+    requestAnimationFrame(() => recomputeRef.current());
 
     return () => {
       if (saveTimer.current) window.clearTimeout(saveTimer.current);
@@ -187,6 +189,61 @@ export function Workspace() {
 
   const addDialogueExt = useCallback((ext: string) => run(appendCharacterExtension(ext)), [run]);
 
+  // Recalcula la posición de cada nota en el margen oscuro, alineada con su línea.
+  const recomputeNotes = useCallback(() => {
+    const view = viewRef.current;
+    const pageEl = mountRef.current?.parentElement; // .page (hoja blanca)
+    if (!view || !pageEl) {
+      setMarginNotes([]);
+      return;
+    }
+    const pageRect = pageEl.getBoundingClientRect();
+    const CARD = 150;
+    const GAP = 14;
+    // ¿Hay sitio a la izquierda? Si no, usar la derecha.
+    const leftRoom = pageRect.left >= CARD + GAP + 6;
+    const side: "left" | "right" = leftRoom ? "left" : "right";
+    const left = leftRoom
+      ? pageRect.left - CARD - GAP
+      : Math.min(window.innerWidth - CARD - 6, pageRect.right + GAP);
+
+    const out: MarginNote[] = [];
+    for (const n of getNotes(view.state)) {
+      const pos = Math.min(Math.max(1, n.pos), view.state.doc.content.size);
+      let top: number;
+      try {
+        top = view.coordsAtPos(pos).top;
+      } catch {
+        continue;
+      }
+      // Sólo las que caen dentro del área visible del editor.
+      if (top < 120 || top > window.innerHeight - 60) continue;
+      out.push({ id: n.id, text: n.text, top, left, side });
+    }
+    setMarginNotes(out);
+  }, []);
+
+  // Mantener el ref al recálculo y escuchar scroll/resize.
+  recomputeRef.current = recomputeNotes;
+  useEffect(() => {
+    const onChange = () => requestAnimationFrame(() => recomputeRef.current());
+    const el = scrollRef.current;
+    el?.addEventListener("scroll", onChange, { passive: true });
+    window.addEventListener("resize", onChange);
+    return () => {
+      el?.removeEventListener("scroll", onChange);
+      window.removeEventListener("resize", onChange);
+    };
+  }, []);
+
+  const openNoteById = useCallback((id: string) => {
+    const view = viewRef.current;
+    if (!view) return;
+    const c = noteCoords(view, id);
+    const note = getNotes(view.state).find((n) => n.id === id);
+    if (c && note) setOpenNote({ id, left: c.left, top: c.top, text: note.text });
+  }, []);
+
   const createNote = useCallback(() => {
     const view = viewRef.current;
     if (!view) return;
@@ -196,16 +253,21 @@ export function Workspace() {
     view.focus();
   }, []);
 
-  const saveNote = useCallback((id: string, text: string) => {
-    const view = viewRef.current;
-    if (view) updateNote(view, id, text);
-    setOpenNote(null);
-  }, []);
+  const saveNote = useCallback(
+    (id: string, text: string) => {
+      const view = viewRef.current;
+      if (view) updateNote(view, id, text);
+      setOpenNote(null);
+      requestAnimationFrame(() => recomputeRef.current());
+    },
+    [],
+  );
 
   const deleteNote = useCallback((id: string) => {
     const view = viewRef.current;
     if (view) removeNote(view, id);
     setOpenNote(null);
+    requestAnimationFrame(() => recomputeRef.current());
   }, []);
 
   const openPreview = useCallback(() => {
@@ -481,12 +543,14 @@ export function Workspace() {
         {showNav && (
           <SceneNavigator scenes={scenes} onJump={goToScene} onClose={() => setShowNav(false)} />
         )}
-        <div className="page-scroll">
+        <div className="page-scroll" ref={scrollRef}>
           <div className="page">
             <div className="pm-mount" ref={mountRef} />
           </div>
         </div>
       </div>
+
+      <NotesMargin notes={marginNotes} onOpen={openNoteById} />
 
       <StatusBar
         current={current}

@@ -1939,3 +1939,59 @@ a:focus-visible {
   margin-top: 0.3rem;
   line-height: 1.4;
 }
+
+/* ---------- Notas del director en el margen ---------- */
+.margin-note {
+  position: fixed;
+  z-index: 30;
+  width: 150px;
+  max-height: 120px;
+  overflow: hidden;
+  display: flex;
+  gap: 5px;
+  background: rgba(200, 128, 58, 0.12);
+  border: 1px solid rgba(200, 128, 58, 0.38);
+  border-radius: 7px;
+  padding: 5px 7px;
+  cursor: pointer;
+  font-family: var(--ui-font);
+  font-size: 11px;
+  line-height: 1.35;
+  color: #e0cdb4;
+  transition: background var(--t-fast), transform var(--t-fast);
+}
+.margin-note:hover {
+  background: rgba(200, 128, 58, 0.22);
+  transform: translateY(-1px);
+}
+/* Pequeña marca que apunta hacia la página */
+.margin-note-left::after,
+.margin-note-right::after {
+  content: "";
+  position: absolute;
+  top: 10px;
+  width: 0;
+  height: 0;
+  border: 5px solid transparent;
+}
+.margin-note-left::after {
+  right: -10px;
+  border-left-color: rgba(200, 128, 58, 0.38);
+}
+.margin-note-right::after {
+  left: -10px;
+  border-right-color: rgba(200, 128, 58, 0.38);
+}
+.margin-note-pin {
+  color: var(--accent);
+  flex: 0 0 auto;
+  font-size: 12px;
+  line-height: 1.2;
+}
+.margin-note-text {
+  flex: 1;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+}

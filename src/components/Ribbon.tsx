@@ -166,15 +166,14 @@ export function Ribbon(props: Props) {
             </Group>
 
             <Group label="Diálogo">
-              <button className="rb-btn" onClick={() => props.onDialogueExt("V.O.")} title="Añadir (V.O.) al personaje">
-                (V.O.)
-              </button>
-              <button className="rb-btn" onClick={() => props.onDialogueExt("O.S.")} title="Añadir (O.S.) al personaje">
-                (O.S.)
-              </button>
-              <button className="rb-btn" onClick={() => props.onDialogueExt("CONT'D")} title="Añadir (CONT'D) al personaje">
-                (CONT'D)
-              </button>
+              <Menu
+                label="Extensión"
+                items={[
+                  { label: "(V.O.) — voz en off", onClick: () => props.onDialogueExt("V.O.") },
+                  { label: "(O.S.) — fuera de cuadro", onClick: () => props.onDialogueExt("O.S.") },
+                  { label: "(CONT'D) — continúa", onClick: () => props.onDialogueExt("CONT'D") },
+                ]}
+              />
             </Group>
 
             <Group label="Vista">

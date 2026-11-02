@@ -6,7 +6,7 @@
  * posiciones se remapean en cada cambio del documento para seguir al texto.
  */
 import { Plugin, PluginKey, EditorState, Transaction } from "prosemirror-state";
-import { Decoration, DecorationSet, EditorView } from "prosemirror-view";
+import { EditorView } from "prosemirror-view";
 
 export interface Note {
   id: string;
@@ -39,14 +39,14 @@ type NotesMeta =
   | { type: "update"; id: string; text: string }
   | { type: "remove"; id: string };
 
-export function notesPlugin(onOpen: (id: string) => void): Plugin<Note[]> {
+export function notesPlugin(): Plugin<Note[]> {
   return new Plugin<Note[]>({
     key: notesKey,
     state: {
       init: () => load(),
       apply(tr, value) {
         let notes = value;
-        // Remapear posiciones al cambiar el documento.
+        // Remapear posiciones al cambiar el documento (las notas siguen al texto).
         if (tr.docChanged) {
           notes = notes.map((n) => ({ ...n, pos: tr.mapping.map(n.pos) }));
         }
@@ -60,32 +60,6 @@ export function notesPlugin(onOpen: (id: string) => void): Plugin<Note[]> {
           persist(notes);
         }
         return notes;
-      },
-    },
-    props: {
-      decorations(state) {
-        const notes = notesKey.getState(state) ?? [];
-        const size = state.doc.content.size;
-        const decos = notes.map((n) => {
-          const pos = Math.min(Math.max(1, n.pos), size);
-          return Decoration.widget(
-            pos,
-            () => {
-              const el = document.createElement("span");
-              el.className = "note-marker";
-              el.textContent = "📝 " + (n.text.trim() ? n.text.slice(0, 18) : "nota");
-              el.setAttribute("contenteditable", "false");
-              el.addEventListener("mousedown", (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onOpen(n.id);
-              });
-              return el;
-            },
-            { side: -1, key: `note-${n.id}-${n.text.length}` },
-          );
-        });
-        return DecorationSet.create(state.doc, decos);
       },
     },
   });
