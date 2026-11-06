@@ -1944,25 +1944,27 @@ a:focus-visible {
 .margin-note {
   position: fixed;
   z-index: 30;
-  width: 150px;
-  max-height: 120px;
+  width: 158px;
+  max-height: 84px;
   overflow: hidden;
   display: flex;
-  gap: 5px;
-  background: rgba(200, 128, 58, 0.12);
-  border: 1px solid rgba(200, 128, 58, 0.38);
+  gap: 6px;
+  background: color-mix(in srgb, var(--note-color, #c8803a) 14%, #201f1b);
+  border: 1px solid var(--note-color, #c8803a);
   border-radius: 7px;
-  padding: 5px 7px;
+  padding: 5px 6px 5px 4px;
   cursor: pointer;
   font-family: var(--ui-font);
   font-size: 11px;
   line-height: 1.35;
-  color: #e0cdb4;
-  transition: background var(--t-fast), transform var(--t-fast);
+  color: #e8e1d4;
+  transition: max-height var(--t-fast), background var(--t-fast), box-shadow var(--t-fast);
 }
+/* Al pasar el cursor, la nota se expande para leerla completa (notas largas). */
 .margin-note:hover {
-  background: rgba(200, 128, 58, 0.22);
-  transform: translateY(-1px);
+  max-height: 320px;
+  z-index: 45;
+  box-shadow: var(--shadow-pop);
 }
 /* Pequeña marca que apunta hacia la página */
 .margin-note-left::after,
@@ -1976,24 +1978,32 @@ a:focus-visible {
 }
 .margin-note-left::after {
   right: -10px;
-  border-left-color: rgba(200, 128, 58, 0.38);
+  border-left-color: var(--note-color, #c8803a);
 }
 .margin-note-right::after {
   left: -10px;
-  border-right-color: rgba(200, 128, 58, 0.38);
+  border-right-color: var(--note-color, #c8803a);
 }
-.margin-note-pin {
-  color: var(--accent);
-  flex: 0 0 auto;
-  font-size: 12px;
-  line-height: 1.2;
+.margin-note-bar {
+  flex: 0 0 3px;
+  border-radius: 2px;
+  align-self: stretch;
+}
+.margin-note-body {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+}
+.margin-note-cat {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-weight: 600;
+  margin-bottom: 2px;
 }
 .margin-note-text {
-  flex: 1;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 5;
-  -webkit-box-orient: vertical;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 .margin-note-del {
   flex: 0 0 auto;
@@ -2014,3 +2024,107 @@ a:focus-visible {
   background: rgba(217, 112, 95, 0.2);
   color: var(--danger);
 }
+
+/* ---------- Selector de documento (proyectos) ---------- */
+.rb-doc-label {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  vertical-align: middle;
+}
+.ribbon-tabbar .menu > .btn-ghost {
+  background: #262420;
+  font-size: 0.8rem;
+}
+
+/* ---------- Selector de categoría de nota ---------- */
+.note-cat-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 0.5rem;
+}
+.note-cat {
+  font-family: var(--ui-font);
+  font-size: 0.68rem;
+  border: 1px solid;
+  border-radius: 12px;
+  padding: 0.12rem 0.45rem;
+  cursor: pointer;
+  background: transparent;
+}
+
+.dir-shots-head-actions { display: flex; gap: 0.4rem; }
+
+/* ---------- Análisis: estadísticas ---------- */
+.an-stats { display: grid; grid-template-columns: repeat(auto-ffill, minmax(110px, 1fr)); gap: 0.6rem; }
+.an-stats { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+.an-stat { background: #141311; border: 1px solid var(--bar-line); border-radius: 8px; padding: 0.5rem 0.6rem; text-align: center; }
+.an-stat-val { font-size: 1.25rem; font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; }
+.an-stat-label { font-size: 0.7rem; color: var(--muted); margin-top: 0.1rem; }
+.an-chars { display: flex; flex-direction: column; gap: 0.35rem; }
+.an-char-row { display: flex; align-items: center; gap: 0.6rem; }
+.an-char-name { flex: 0 0 120px; font-family: var(--script-font); font-size: 0.8rem; text-transform: uppercase; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.an-char-bar { flex: 1; height: 8px; background: #26241f; border-radius: 4px; overflow: hidden; }
+.an-char-fill { height: 100%; background: var(--accent); }
+.an-char-val { flex: 0 0 auto; font-size: 0.78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* ---------- Red neuronal: búsqueda ---------- */
+.nm-search {
+  font-family: var(--ui-font); font-size: 0.8rem; color: var(--ink);
+  background: var(--field); border: 1px solid var(--bar-line); border-radius: 6px;
+  padding: 0.3rem 0.5rem; width: 150px;
+}
+.btn-ghost.is-on-ghost { color: var(--accent); border-color: rgba(200,128,58,0.45); background: var(--accent-soft); }
+
+/* ---------- Beat Timeline ---------- */
+.bt-add { display: flex; gap: 0.3rem; margin-right: auto; flex-wrap: wrap; }
+.bt-add-btn {
+  font-family: var(--ui-font); font-size: 0.74rem; background: transparent;
+  border: 1px solid; border-radius: 12px; padding: 0.22rem 0.5rem; cursor: pointer;
+}
+.bt-zoom { display: flex; gap: 0.25rem; }
+.bt-zoom button {
+  width: 30px; height: 28px; border-radius: 6px; background: #26241f; color: var(--ink);
+  border: 1px solid var(--bar-line); cursor: pointer; font-size: 0.8rem;
+}
+.bt-body { flex: 1; display: flex; min-height: 0; }
+.bt-lanes-col { flex: 0 0 150px; background: var(--desk-2); border-right: 1px solid var(--bar-line); }
+.bt-corner { border-bottom: 1px solid var(--bar-line); }
+.bt-lane-label {
+  display: flex; align-items: center; gap: 0.4rem; padding: 0 0.6rem;
+  font-size: 0.76rem; color: var(--muted); border-bottom: 1px solid var(--bar-line);
+}
+.bt-lane-dot { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto; }
+.bt-scroll { flex: 1; overflow: auto; background: #141311; }
+.bt-ruler { position: relative; border-bottom: 1px solid var(--bar-line); background: var(--bar); }
+.bt-tick { position: absolute; top: 0; height: 100%; border-left: 1px solid var(--bar-line); }
+.bt-tick span { font-size: 0.66rem; color: var(--muted-dim); padding-left: 3px; }
+.bt-lanes { position: relative; }
+.bt-lane { position: relative; border-bottom: 1px solid #211f1c; background: repeating-linear-gradient(90deg, transparent 0, transparent calc(300 * 0.18px - 1px)); }
+.bt-item {
+  position: absolute; top: 8px; bottom: 8px; border-radius: 5px; cursor: grab;
+  display: flex; align-items: center; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  touch-action: none; opacity: 0.9;
+}
+.bt-item:active { cursor: grabbing; }
+.bt-item.is-sel { outline: 2px solid #fff; opacity: 1; }
+.bt-item-label { font-family: var(--ui-font); font-size: 0.72rem; color: #1a1407; font-weight: 600; padding: 0 5px; white-space: nowrap; }
+.bt-inspector {
+  display: flex; align-items: center; gap: 0.8rem; padding: 0.5rem 1rem;
+  background: var(--bar); border-top: 1px solid var(--bar-line); flex-wrap: wrap;
+}
+.bt-insp-label {
+  font-family: var(--ui-font); font-size: 0.85rem; color: var(--ink); background: var(--field);
+  border: 1px solid var(--bar-line); border-radius: 6px; padding: 0.35rem 0.5rem; min-width: 200px;
+}
+.bt-inspector label { font-size: 0.76rem; color: var(--muted); display: flex; align-items: center; gap: 0.3rem; }
+.bt-inspector label input {
+  width: 64px; font-size: 0.8rem; color: var(--ink); background: var(--field);
+  border: 1px solid var(--bar-line); border-radius: 5px; padding: 0.25rem 0.35rem;
+}
+.bt-insp-time { font-size: 0.78rem; color: var(--accent); font-variant-numeric: tabular-nums; }
+.bt-insp-del { background: transparent; border: 1px solid var(--bar-line); color: var(--muted); border-radius: 6px; padding: 0.3rem 0.6rem; cursor: pointer; font-size: 0.78rem; }
+.bt-insp-del:hover { color: var(--danger); border-color: var(--danger); }

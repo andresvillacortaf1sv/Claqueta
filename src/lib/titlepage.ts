@@ -1,5 +1,6 @@
 /** Datos de la página de título (portada) del guion, guardados localmente. */
 
+import { pkey } from "./projects";
 export interface TitlePage {
   title: string;
   author: string;
@@ -8,7 +9,6 @@ export interface TitlePage {
   draft: string;
 }
 
-const STORAGE_KEY = "claqueta:portada";
 
 export const EMPTY_TITLE_PAGE: TitlePage = {
   title: "",
@@ -19,7 +19,7 @@ export const EMPTY_TITLE_PAGE: TitlePage = {
 };
 
 export function loadTitlePage(): TitlePage {
-  const saved = localStorage.getItem(STORAGE_KEY);
+  const saved = localStorage.getItem(pkey("portada"));
   if (saved) {
     try {
       return { ...EMPTY_TITLE_PAGE, ...JSON.parse(saved) };
@@ -32,7 +32,7 @@ export function loadTitlePage(): TitlePage {
 
 export function saveTitlePage(tp: TitlePage): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tp));
+    localStorage.setItem(pkey("portada"), JSON.stringify(tp));
   } catch {
     /* almacenamiento no disponible */
   }

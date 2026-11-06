@@ -37,6 +37,8 @@ export function NeuralMap({ graph, onJump, onClose }: Props) {
   const [seed, setSeed] = useState(1);
   const [, setTick] = useState(0);
   const [vb, setVb] = useState({ x: 0, y: 0, w: W, h: H });
+  const [showSeq, setShowSeq] = useState(true);
+  const [query, setQuery] = useState("");
 
   // Layout del grafo COMPLETO (estable al ocultar capas)
   const layout = useMemo(
@@ -95,10 +97,23 @@ export function NeuralMap({ graph, onJump, onClose }: Props) {
 
   const shownNodes = graph.nodes.filter((n) => visible[n.type]);
   const shownIds = new Set(shownNodes.map((n) => n.id));
-  const shownLinks = graph.links.filter((l) => shownIds.has(l.source) && shownIds.has(l.target));
+  const shownLinks = graph.links.filter(
+    (l) => shownIds.has(l.source) && shownIds.has(l.target) && (showSeq || l.kind !== "seq"),
+  );
+
+  // Nodos aislados: sin ningún enlace visible.
+  const connected = new Set<string>();
+  shownLinks.forEach((l) => {
+    connected.add(l.source);
+    connected.add(l.target);
+  });
+
+  const q = query.trim().toLowerCase();
+  const matches = (n: { label: string }) => q !== "" && n.label.toLowerCase().includes(q);
 
   const counts: Record<NodeType, number> = { scene: 0, character: 0, place: 0, object: 0 };
   graph.nodes.forEach((n) => counts[n.type]++);
+  const isolatedCount = shownNodes.filter((n) => !connected.has(n.id)).length;
 
   return (
     <div className="beatboard-overlay" role="dialog" aria-label="Red neuronal">
@@ -116,7 +131,16 @@ export function NeuralMap({ graph, onJump, onClose }: Props) {
             </button>
           ))}
         </div>
-        <button className={"btn-ghost" + (labels ? "" : "")} onClick={() => setLabels((l) => !l)}>
+        <input
+          className="nm-search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Buscar nodo…"
+        />
+        <button className={"btn-ghost" + (showSeq ? " is-on-ghost" : "")} onClick={() => setShowSeq((s) => !s)} title="Enlaces de secuencia entre escenas">
+          Secuencia
+        </button>
+        <button className="btn-ghost" onClick={() => setLabels((l) => !l)}>
           {labels ? "Ocultar rótulos" : "Mostrar rótulos"}
         </button>
         <button className="btn-ghost" onClick={() => setSeed((s) => s + 1)}>
@@ -158,8 +182,13 @@ export function NeuralMap({ graph, onJump, onClose }: Props) {
             const p = posRef.current.get(n.id);
             if (!p) return null;
             const r = Math.min(16, 4 + n.degree);
+            const hit = matches(n);
+            const dim = q !== "" && !hit;
+            const isolated = !connected.has(n.id);
             return (
-              <g key={n.id} className="nm-node" onPointerDown={nodeDown(n.id)}>
+              <g key={n.id} className="nm-node" opacity={dim ? 0.2 : 1} onPointerDown={nodeDown(n.id)}>
+                {hit && <circle cx={p.x} cy={p.y} r={r + 6} fill="none" stroke="#fff" strokeWidth={2} />}
+                {isolated && <circle cx={p.x} cy={p.y} r={r + 3} fill="none" stroke="#d9705f" strokeWidth={1.5} strokeDasharray="2 2" />}
                 <circle
                   cx={p.x}
                   cy={p.y}
@@ -188,7 +217,7 @@ export function NeuralMap({ graph, onJump, onClose }: Props) {
         </div>
 
         <div className="nm-stats">
-          {graph.nodes.length} nodos · {graph.links.length} enlaces · doble clic en una escena para ir al guion · arrastra nodos o el fondo
+          {graph.nodes.length} nodos · {shownLinks.length} enlaces visibles · {isolatedCount} aislados (anillo rojo) · doble clic en una escena para ir al guion
         </div>
       </div>
     </div>

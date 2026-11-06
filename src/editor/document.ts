@@ -9,9 +9,9 @@ import { Node as PMNode } from "prosemirror-model";
 import { schema } from "./schema";
 import { Block } from "../lib/serialize";
 
-const STORAGE_KEY = "claqueta:documento";
 
 /** Guion de ejemplo para la primera apertura. */
+import { pkey } from "../lib/projects";
 function documentoEjemplo(): PMNode {
   return schema.node("doc", null, [
     schema.node("scene_heading", null, [schema.text("INT. CAFÉ DE BARRIO - DÍA")]),
@@ -35,7 +35,7 @@ function documentoEjemplo(): PMNode {
 }
 
 export function cargarDocumento(): PMNode {
-  const guardado = localStorage.getItem(STORAGE_KEY);
+  const guardado = localStorage.getItem(pkey("documento"));
   if (guardado) {
     try {
       return schema.nodeFromJSON(JSON.parse(guardado));
@@ -57,7 +57,7 @@ export function docFromBlocks(blocks: Block[]): PMNode {
 
 export function guardarDocumento(doc: PMNode): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(doc.toJSON()));
+    localStorage.setItem(pkey("documento"), JSON.stringify(doc.toJSON()));
   } catch (e) {
     console.warn("No se pudo guardar el documento.", e);
   }

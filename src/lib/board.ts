@@ -3,6 +3,7 @@
  * modo de línea de tiempo. Guardado local por tablero.
  */
 
+import { pkey } from "./projects";
 export type CardKind = "idea" | "nota" | "hito" | "imagen";
 
 export interface BoardCard {
@@ -36,11 +37,10 @@ export const CARD_KINDS: { id: CardKind; label: string; color: string }[] = [
   { id: "imagen", label: "Imagen", color: "#8a63d2" },
 ];
 
-const KEY = "claqueta:pizarras";
 
 export function loadBoards(): Board[] {
   try {
-    const v = JSON.parse(localStorage.getItem(KEY) || "[]");
+    const v = JSON.parse(localStorage.getItem(pkey("pizarras")) || "[]");
     return Array.isArray(v) && v.length ? v : [defaultBoard()];
   } catch {
     return [defaultBoard()];
@@ -49,7 +49,7 @@ export function loadBoards(): Board[] {
 
 export function saveBoards(boards: Board[]): void {
   try {
-    localStorage.setItem(KEY, JSON.stringify(boards));
+    localStorage.setItem(pkey("pizarras"), JSON.stringify(boards));
   } catch {
     /* almacenamiento no disponible */
   }

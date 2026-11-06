@@ -4,11 +4,11 @@
  */
 import { CharacterStat } from "./characters";
 
-const KEY = "claqueta:personajes-manuales";
 
+import { pkey } from "./projects";
 export function loadManualCharacters(): string[] {
   try {
-    const v = JSON.parse(localStorage.getItem(KEY) || "[]");
+    const v = JSON.parse(localStorage.getItem(pkey("personajes-manuales")) || "[]");
     return Array.isArray(v) ? v : [];
   } catch {
     return [];
@@ -17,7 +17,7 @@ export function loadManualCharacters(): string[] {
 
 function persist(list: string[]): void {
   try {
-    localStorage.setItem(KEY, JSON.stringify(list));
+    localStorage.setItem(pkey("personajes-manuales"), JSON.stringify(list));
   } catch {
     /* no disponible */
   }

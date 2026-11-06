@@ -259,10 +259,18 @@ export function Direction({ scenes, onJump, onClose }: Props) {
             <div className="dir-shots">
               <div className="dir-shots-head">
                 <h3 className="dir-title">{scene.heading}</h3>
-                <button className="rb-btn rb-btn-primary" onClick={addShot}>
-                  + Añadir plano
-                </button>
+                <div className="dir-shots-head-actions">
+                  <button className="rb-btn" onClick={() => setShowScene((v) => !v)}>
+                    {showScene ? "Ocultar escena" : "Ver escena"}
+                  </button>
+                  <button className="rb-btn rb-btn-primary" onClick={addShot}>
+                    + Añadir plano
+                  </button>
+                </div>
               </div>
+              {showScene && (
+                <pre className="dir-scene-text">{scene.body || "(escena sin contenido)"}</pre>
+              )}
               {ds.shots.length === 0 && <div className="beat-empty">Sin planos. Añade el primero.</div>}
               {ds.shots.map((s) => (
                 <div className="dir-shot" key={s.id}>

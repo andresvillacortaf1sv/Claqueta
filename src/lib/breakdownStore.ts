@@ -3,6 +3,7 @@
  * Cada categoría es texto libre separado por comas (una lista de elementos).
  */
 
+import { pkey } from "./projects";
 export type Category = "utileria" | "vestuario" | "vehiculos" | "extras" | "efectos" | "notas";
 
 export const CATEGORIES: { id: Category; label: string }[] = [
@@ -17,11 +18,10 @@ export const CATEGORIES: { id: Category; label: string }[] = [
 export type SceneElements = Partial<Record<Category, string>>;
 export type BreakdownData = Record<string, SceneElements>;
 
-const KEY = "claqueta:desglose";
 
 export function loadBreakdown(): BreakdownData {
   try {
-    return JSON.parse(localStorage.getItem(KEY) || "{}");
+    return JSON.parse(localStorage.getItem(pkey("desglose")) || "{}");
   } catch {
     return {};
   }
@@ -35,7 +35,7 @@ export function setBreakdownField(
 ): BreakdownData {
   const next: BreakdownData = { ...data, [sceneKey]: { ...(data[sceneKey] ?? {}), [category]: value } };
   try {
-    localStorage.setItem(KEY, JSON.stringify(next));
+    localStorage.setItem(pkey("desglose"), JSON.stringify(next));
   } catch {
     /* almacenamiento no disponible */
   }

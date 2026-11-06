@@ -1,14 +1,16 @@
 /**
  * Capa de notas en el margen: muestra las notas del director en el área oscura
- * junto a la página, alineadas verticalmente con la línea que anotan. Siempre
- * visibles; al hacer clic se editan.
+ * junto a la página, alineadas con la línea que anotan. Siempre visibles; al
+ * pasar el cursor se expanden para leerlas completas; clic para editar.
  */
 export interface MarginNote {
   id: string;
   text: string;
-  top: number; // px, relativo a la ventana (fixed)
+  top: number;
   left: number;
   side: "left" | "right";
+  color: string;
+  categoryLabel: string;
 }
 
 interface Props {
@@ -24,15 +26,20 @@ export function NotesMargin({ notes, onOpen, onDelete }: Props) {
         <div
           key={n.id}
           className={"margin-note margin-note-" + n.side}
-          style={{ top: n.top, left: n.left }}
+          style={{ top: n.top, left: n.left, borderColor: n.color, ["--note-color" as string]: n.color }}
           onMouseDown={(e) => {
             e.preventDefault();
             onOpen(n.id);
           }}
-          title="Clic para editar · papelera para borrar"
+          title="Clic para editar"
         >
-          <span className="margin-note-pin">✎</span>
-          <span className="margin-note-text">{n.text.trim() || "(nota vacía)"}</span>
+          <div className="margin-note-bar" style={{ background: n.color }} />
+          <div className="margin-note-body">
+            <div className="margin-note-cat" style={{ color: n.color }}>
+              {n.categoryLabel}
+            </div>
+            <div className="margin-note-text">{n.text.trim() || "(nota vacía)"}</div>
+          </div>
           <button
             className="margin-note-del"
             title="Borrar nota"

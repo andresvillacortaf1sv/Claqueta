@@ -8,6 +8,42 @@
  */
 import { Plugin, PluginKey, EditorState, Transaction, Command } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
+import { schema } from "./schema";
+
+/**
+ * Resaltado inline por selección: aplica la marca `highlight` al texto
+ * seleccionado (una palabra, una línea, un párrafo…). Si no hay selección,
+ * resalta el bloque actual completo, como atajo.
+ */
+export function highlightSelection(color: string): Command {
+  return (state, dispatch) => {
+    let { from, to, empty } = state.selection;
+    if (empty) {
+      const $f = state.selection.$from;
+      from = $f.start();
+      to = $f.end();
+    }
+    if (from >= to) return false;
+    if (dispatch) {
+      const mark = schema.marks.highlight.create({ color });
+      dispatch(state.tr.addMark(from, to, mark).removeStoredMark(schema.marks.highlight));
+    }
+    return true;
+  };
+}
+
+/** Quita el resaltado de la selección (o del bloque actual si no hay selección). */
+export const clearHighlightSelection: Command = (state, dispatch) => {
+  let { from, to, empty } = state.selection;
+  if (empty) {
+    const $f = state.selection.$from;
+    from = $f.start();
+    to = $f.end();
+  }
+  if (from >= to) return false;
+  if (dispatch) dispatch(state.tr.removeMark(from, to, schema.marks.highlight));
+  return true;
+};
 
 export interface RevisionState {
   enabled: boolean;

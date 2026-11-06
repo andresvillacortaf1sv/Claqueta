@@ -132,3 +132,14 @@
   opacity: 0.85;
 }
 
+
+/* Resaltado inline por selección (marca highlight) */
+.hl { border-radius: 2px; padding: 0 1px; }
+.hl-blue      { background: rgba(45, 108, 223, 0.30); }
+.hl-pink      { background: rgba(224, 90, 160, 0.30); }
+.hl-yellow    { background: rgba(201, 162, 26, 0.38); }
+.hl-green     { background: rgba(46, 158, 91, 0.30); }
+.hl-goldenrod { background: rgba(184, 134, 11, 0.34); }
+.hl-buff      { background: rgba(156, 132, 87, 0.38); }
+.hl-salmon    { background: rgba(232, 121, 90, 0.34); }
+.hl-cherry    { background: rgba(177, 34, 59, 0.30); }

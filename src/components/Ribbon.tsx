@@ -25,10 +25,8 @@ interface Props {
   onImportFountain: () => void;
   onExportFdx: () => void;
   onExportFountain: () => void;
-  revEnabled: boolean;
   revId: string;
   onPickRevision: (id: string) => void;
-  onDisableRevision: () => void;
   onClearRevisions: () => void;
   navOpen: boolean;
   onToggleNav: () => void;
@@ -49,9 +47,16 @@ interface Props {
   onAnalysis: () => void;
   onConceptBoard: () => void;
   onDirection: () => void;
+  onBeatTimeline: () => void;
   onDevelopment: () => void;
   onAddNote: () => void;
   onDialogueExt: (ext: string) => void;
+  projects: { id: string; name: string }[];
+  activeProject: string;
+  onOpenProject: (id: string) => void;
+  onNewProject: () => void;
+  onRenameProject: () => void;
+  onDeleteProject: () => void;
 }
 
 function Group({ label, children }: { label: string; children: ReactNode }) {
@@ -74,6 +79,22 @@ export function Ribbon(props: Props) {
           <span className="toolbar-logo">◉</span>
           <span className="toolbar-title">Claqueta</span>
         </div>
+        <Menu
+          label={
+            <span className="rb-doc-label">
+              📄 {props.projects.find((p) => p.id === props.activeProject)?.name ?? "Documento"}
+            </span>
+          }
+          items={[
+            { label: "＋ Nuevo documento", onClick: props.onNewProject },
+            { label: "✎ Renombrar", onClick: props.onRenameProject },
+            { label: "🗑 Eliminar este documento", onClick: props.onDeleteProject },
+            ...props.projects.map((p) => ({
+              label: (p.id === props.activeProject ? "● " : "○ ") + p.name,
+              onClick: () => props.onOpenProject(p.id),
+            })),
+          ]}
+        />
         <div className="ribbon-tabs">
           <button
             className={"rb-tab" + (tab === "inicio" ? " is-active" : "")}
@@ -236,32 +257,22 @@ export function Ribbon(props: Props) {
         )}
 
         {tab === "edicion" && (
-          <Group label="Revisión">
+          <Group label="Resaltado">
             <div className="rb-swatches">
               {REVISIONS.map((r) => (
                 <button
                   key={r.id}
-                  className={"rb-swatch" + (props.revEnabled && props.revId === r.id ? " is-on" : "")}
+                  className={"rb-swatch" + (props.revId === r.id ? " is-on" : "")}
                   style={{ background: r.hex }}
-                  title={r.label}
+                  title={`Resaltar selección en ${r.label}`}
                   onClick={() => props.onPickRevision(r.id)}
                 />
               ))}
             </div>
-            <button
-              className={"rb-btn" + (props.revEnabled ? " is-on" : "")}
-              onClick={props.revEnabled ? props.onDisableRevision : () => props.onPickRevision(props.revId)}
-            >
-              {props.revEnabled ? "Desactivar" : "Activar"}
+            <button className="rb-btn" onClick={props.onClearRevisions} title="Quitar resaltado de la selección">
+              Quitar resaltado
             </button>
-            <button className="rb-btn" onClick={props.onClearRevisions}>
-              Limpiar marcas
-            </button>
-            <span className="rb-rev-status">
-              {props.revEnabled
-                ? `Marcando en ${REVISIONS.find((r) => r.id === props.revId)?.label ?? ""}`
-                : "Desactivado"}
-            </span>
+            <span className="rb-rev-status">Selecciona texto y elige un color</span>
           </Group>
         )}
 
@@ -291,6 +302,9 @@ export function Ribbon(props: Props) {
               </button>
               <button className="rb-btn" onClick={props.onConceptBoard} title="Mapas, notas y líneas de tiempo">
                 Pizarra
+              </button>
+              <button className="rb-btn" onClick={props.onBeatTimeline} title="Línea de tiempo de beats">
+                Beat Timeline
               </button>
             </Group>
             <Group label="Dirección">

@@ -70,6 +70,18 @@ export const schema = new Schema({
       parseDOM: [{ tag: "s" }, { tag: "strike" }, { style: "text-decoration=line-through" }],
       toDOM: () => ["s", 0],
     },
+    // Resaltado por selección (palabra, línea, párrafo…), con color de revisión.
+    highlight: {
+      attrs: { color: { default: "blue" } },
+      inclusive: false,
+      parseDOM: [
+        {
+          tag: "span[data-hl]",
+          getAttrs: (dom) => ({ color: (dom as HTMLElement).getAttribute("data-hl") || "blue" }),
+        },
+      ],
+      toDOM: (mark) => ["span", { "data-hl": mark.attrs.color, class: "hl hl-" + mark.attrs.color }, 0],
+    },
   },
 });
 

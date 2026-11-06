@@ -4,6 +4,7 @@
  * comparando con las escenas del guion. Guardado local.
  */
 
+import { pkey } from "./projects";
 export type StripKind = "scene" | "meal" | "move" | "note";
 
 export interface Strip {
@@ -23,11 +24,10 @@ export interface Schedule {
   days: ShootDay[];
 }
 
-const KEY = "claqueta:plan-rodaje";
 
 export function loadSchedule(): Schedule {
   try {
-    const v = JSON.parse(localStorage.getItem(KEY) || "");
+    const v = JSON.parse(localStorage.getItem(pkey("plan-rodaje")) || "");
     if (v && Array.isArray(v.days)) return v;
   } catch {
     /* vacío */
@@ -37,7 +37,7 @@ export function loadSchedule(): Schedule {
 
 export function saveSchedule(s: Schedule): void {
   try {
-    localStorage.setItem(KEY, JSON.stringify(s));
+    localStorage.setItem(pkey("plan-rodaje"), JSON.stringify(s));
   } catch {
     /* no disponible */
   }

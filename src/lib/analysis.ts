@@ -31,6 +31,93 @@ export interface Analysis {
   aiGenerated: boolean;
 }
 
+export interface ScriptStats {
+  scenes: number;
+  pages: number; // estimación (55 líneas/página)
+  words: number;
+  dialogueLines: number;
+  actionLines: number;
+  dialoguePct: number; // % de líneas que son diálogo
+  intCount: number;
+  extCount: number;
+  dayCount: number;
+  nightCount: number;
+  avgSceneLines: number;
+  longest: { heading: string; lines: number } | null;
+  shortest: { heading: string; lines: number } | null;
+  topCharacters: { name: string; lines: number }[];
+}
+
+function canonical(raw: string): string {
+  return raw.replace(/\s*\(.*\)\s*$/, "").toUpperCase().trim();
+}
+
+export function scriptStats(blocks: Block[]): ScriptStats {
+  const groups = groupScenes(blocks);
+  let words = 0;
+  let dialogueLines = 0;
+  let actionLines = 0;
+  let intCount = 0;
+  let extCount = 0;
+  let dayCount = 0;
+  let nightCount = 0;
+  let totalLines = 0;
+  const charLines = new Map<string, number>();
+  let speaker: string | null = null;
+
+  let longest: { heading: string; lines: number } | null = null;
+  let shortest: { heading: string; lines: number } | null = null;
+
+  for (const b of blocks) {
+    const txt = (b.text ?? "").trim();
+    if (txt) words += txt.split(/\s+/).length;
+    if (b.type === "dialogue" && txt) {
+      dialogueLines++;
+      if (speaker) charLines.set(speaker, (charLines.get(speaker) ?? 0) + 1);
+    }
+    if (b.type === "action" && txt) actionLines++;
+    if (b.type === "character") speaker = canonical(b.text);
+    if (b.type === "scene_heading") {
+      const h = b.text.toUpperCase();
+      if (/\bINT\b/.test(h)) intCount++;
+      if (/\bEXT\b/.test(h)) extCount++;
+      if (/\b(DÍA|DIA|DAY|MAÑANA|TARDE)\b/.test(h)) dayCount++;
+      if (/\b(NOCHE|NIGHT|MADRUGADA)\b/.test(h)) nightCount++;
+    }
+  }
+
+  for (const g of groups) {
+    const lines = g.blocks.length;
+    totalLines += lines;
+    if (!longest || lines > longest.lines) longest = { heading: g.heading, lines };
+    if (!shortest || lines < shortest.lines) shortest = { heading: g.heading, lines };
+  }
+
+  const topCharacters = [...charLines.entries()]
+    .map(([name, lines]) => ({ name, lines }))
+    .sort((a, b) => b.lines - a.lines)
+    .slice(0, 6);
+
+  const nonEmpty = blocks.filter((b) => (b.text ?? "").trim()).length;
+
+  return {
+    scenes: groups.length,
+    pages: Math.max(1, Math.round(totalLines / 55)),
+    words,
+    dialogueLines,
+    actionLines,
+    dialoguePct: nonEmpty ? Math.round((dialogueLines / nonEmpty) * 100) : 0,
+    intCount,
+    extCount,
+    dayCount,
+    nightCount,
+    avgSceneLines: groups.length ? Math.round(totalLines / groups.length) : 0,
+    longest,
+    shortest,
+    topCharacters,
+  };
+}
+
 interface SceneGroup {
   heading: string;
   blocks: Block[];

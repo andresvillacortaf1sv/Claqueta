@@ -3,6 +3,7 @@
  * Cada personaje se guarda bajo la clave `claqueta:bio:<NOMBRE>`.
  */
 
+import { pkey } from "./projects";
 export interface Relationship {
   id: string;
   to: string; // nombre del otro personaje
@@ -132,7 +133,6 @@ export function relationColor(typeId: string): string {
   return RELATION_TYPES.find((t) => t.id === typeId)?.color ?? "#9a938a";
 }
 
-const PREFIX = "claqueta:bio:";
 
 function emptyBio(name: string): CharacterBio {
   const fifty = (arr: { id: string }[]) => Object.fromEntries(arr.map((x) => [x.id, 50]));
@@ -177,7 +177,7 @@ function emptyBio(name: string): CharacterBio {
 
 export function loadBio(name: string): CharacterBio {
   try {
-    const raw = localStorage.getItem(PREFIX + name.toUpperCase());
+    const raw = localStorage.getItem(pkey("bio:") + name.toUpperCase());
     if (raw) return { ...emptyBio(name), ...JSON.parse(raw) };
   } catch {
     /* ignora */
@@ -187,7 +187,7 @@ export function loadBio(name: string): CharacterBio {
 
 export function saveBio(bio: CharacterBio): void {
   try {
-    localStorage.setItem(PREFIX + bio.name.toUpperCase(), JSON.stringify(bio));
+    localStorage.setItem(pkey("bio:") + bio.name.toUpperCase(), JSON.stringify(bio));
   } catch {
     /* almacenamiento lleno (p. ej. foto muy grande) */
   }
@@ -197,9 +197,9 @@ export function loadAllBios(): CharacterBio[] {
   const out: CharacterBio[] = [];
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
-    if (k && k.startsWith(PREFIX)) {
+    if (k && k.startsWith(pkey("bio:"))) {
       try {
-        out.push({ ...emptyBio(k.slice(PREFIX.length)), ...JSON.parse(localStorage.getItem(k)!) });
+        out.push({ ...emptyBio(k.slice(pkey("bio:").length)), ...JSON.parse(localStorage.getItem(k)!) });
       } catch {
         /* ignora */
       }

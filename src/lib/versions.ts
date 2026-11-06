@@ -4,6 +4,7 @@
  */
 import { Block } from "./serialize";
 
+import { pkey } from "./projects";
 export interface Version {
   id: string;
   name: string;
@@ -11,12 +12,11 @@ export interface Version {
   blocks: Block[];
 }
 
-const KEY = "claqueta:versiones";
 const MAX = 50;
 
 export function loadVersions(): Version[] {
   try {
-    const v = JSON.parse(localStorage.getItem(KEY) || "[]");
+    const v = JSON.parse(localStorage.getItem(pkey("versiones")) || "[]");
     return Array.isArray(v) ? v : [];
   } catch {
     return [];
@@ -25,7 +25,7 @@ export function loadVersions(): Version[] {
 
 function persist(list: Version[]): void {
   try {
-    localStorage.setItem(KEY, JSON.stringify(list.slice(0, MAX)));
+    localStorage.setItem(pkey("versiones"), JSON.stringify(list.slice(0, MAX)));
   } catch {
     /* almacenamiento lleno o no disponible */
   }

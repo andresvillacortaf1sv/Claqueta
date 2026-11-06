@@ -7,12 +7,23 @@ import { MarkType } from "prosemirror-model";
 import { schema } from "../editor/schema";
 import { screenplayKeymap, baseKeymapPlugin } from "../editor/keymap";
 import { screenplayInputRules } from "../editor/inputrules";
-import { revisionsPlugin, setRevisionMeta, clearRevisions, applyRevision } from "../editor/revisions";
+import { highlightSelection, clearHighlightSelection } from "../editor/revisions";
 import { contdPlugin } from "../editor/contd";
 import { autocompletePlugin, autocompleteKeymap } from "../editor/autocomplete";
-import { notesPlugin, addNote, updateNote, removeNote, noteCoords, getNotes } from "../editor/notes";
+import { notesPlugin, addNote, updateNote, removeNote, noteCoords, getNotes, noteColor, NOTE_CATEGORIES } from "../editor/notes";
 import { NoteEditor } from "./NoteEditor";
 import { NotesMargin, MarginNote } from "./NotesMargin";
+import {
+  listProjects,
+  getActiveId,
+  setActiveProject,
+  createProject,
+  renameProject,
+  deleteProject,
+  touchProject,
+  ProjectMeta,
+} from "../lib/projects";
+import { ProjectModal } from "./ProjectModal";
 import { cargarDocumento, guardarDocumento, docFromBlocks } from "../editor/document";
 import { setElement, appendCharacterExtension } from "../editor/commands";
 import { downloadText, pickTextFile } from "../lib/files";
@@ -44,6 +55,7 @@ import { AnalysisPanel } from "./AnalysisPanel";
 import { ConceptBoard } from "./ConceptBoard";
 import { Direction } from "./Direction";
 import { DevelopmentModal } from "./DevelopmentModal";
+import { BeatTimeline } from "./BeatTimeline";
 import {
   ElementType,
   ELEMENT_LABELS,
@@ -75,7 +87,6 @@ export function Workspace() {
   const [previewBlocks, setPreviewBlocks] = useState<Block[] | null>(null);
   const [titlePage, setTitlePage] = useState<TitlePage>(() => loadTitlePage());
   const [showTitleModal, setShowTitleModal] = useState(false);
-  const [revEnabled, setRevEnabled] = useState(false);
   const [revId, setRevId] = useState<string>(REVISIONS[0].id);
   const [activeMarks, setActiveMarks] = useState<ActiveMarks>({
     strong: false,
@@ -106,10 +117,15 @@ export function Workspace() {
   const [showConcept, setShowConcept] = useState(false);
   const [dirScenes, setDirScenes] = useState<SceneBreakdown[] | null>(null);
   const [showDev, setShowDev] = useState(false);
-  const [openNote, setOpenNote] = useState<{ id: string; left: number; top: number; text: string } | null>(null);
+  const [showBeatTl, setShowBeatTl] = useState(false);
+  const [openNote, setOpenNote] = useState<{ id: string; left: number; top: number; text: string; category?: string } | null>(null);
   const [marginNotes, setMarginNotes] = useState<MarginNote[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const recomputeRef = useRef<() => void>(() => {});
+  const [projects, setProjects] = useState<ProjectMeta[]>(() => listProjects());
+  const [activeProj, setActiveProj] = useState<string>(() => getActiveId());
+  const [projectVersion, setProjectVersion] = useState(0);
+  const [projModal, setProjModal] = useState<{ mode: "new" | "rename"; name: string } | null>(null);
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -122,7 +138,6 @@ export function Workspace() {
         autocompleteKeymap, // antes del keymap de guion: intercepta Enter/Tab si hay sugerencias
         screenplayKeymap,
         baseKeymapPlugin,
-        revisionsPlugin(),
         contdPlugin(),
         autocompletePlugin(),
         notesPlugin(),
@@ -156,6 +171,7 @@ export function Workspace() {
           if (saveTimer.current) window.clearTimeout(saveTimer.current);
           saveTimer.current = window.setTimeout(() => {
             guardarDocumento(next.doc);
+            touchProject(getActiveId());
             setSave("guardado");
           }, 500);
         }
@@ -173,7 +189,9 @@ export function Workspace() {
       view.destroy();
       viewRef.current = null;
     };
-  }, []);
+    // Recrea el editor al cambiar de documento (proyecto).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectVersion]);
 
   const run = useCallback((cmd: Command) => {
     const view = viewRef.current;
@@ -218,7 +236,8 @@ export function Workspace() {
       }
       // Sólo las que caen dentro del área visible del editor.
       if (top < 120 || top > window.innerHeight - 60) continue;
-      out.push({ id: n.id, text: n.text, top, left, side });
+      const catLabel = NOTE_CATEGORIES.find((c) => c.id === n.category)?.label ?? "Nota";
+      out.push({ id: n.id, text: n.text, top, left, side, color: noteColor(n.category), categoryLabel: catLabel });
     }
     setMarginNotes(out);
   }, []);
@@ -241,7 +260,7 @@ export function Workspace() {
     if (!view) return;
     const c = noteCoords(view, id);
     const note = getNotes(view.state).find((n) => n.id === id);
-    if (c && note) setOpenNote({ id, left: c.left, top: c.top, text: note.text });
+    if (c && note) setOpenNote({ id, left: c.left, top: c.top, text: note.text, category: note.category });
   }, []);
 
   const createNote = useCallback(() => {
@@ -254,9 +273,9 @@ export function Workspace() {
   }, []);
 
   const saveNote = useCallback(
-    (id: string, text: string) => {
+    (id: string, text: string, category: string) => {
       const view = viewRef.current;
-      if (view) updateNote(view, id, text);
+      if (view) updateNote(view, id, text, category);
       setOpenNote(null);
       requestAnimationFrame(() => recomputeRef.current());
     },
@@ -268,6 +287,61 @@ export function Workspace() {
     if (view) removeNote(view, id);
     setOpenNote(null);
     requestAnimationFrame(() => recomputeRef.current());
+  }, []);
+
+  // --- Documentos (proyectos) ---
+  const flushSave = useCallback(() => {
+    const view = viewRef.current;
+    if (view) {
+      guardarDocumento(view.state.doc);
+      touchProject(getActiveId());
+    }
+  }, []);
+
+  const switchProject = useCallback(
+    (id: string) => {
+      if (id === getActiveId()) return;
+      flushSave();
+      setActiveProject(id);
+      setActiveProj(id);
+      setProjects(listProjects());
+      setProjectVersion((v) => v + 1);
+    },
+    [flushSave],
+  );
+
+  const confirmProjectModal = useCallback(
+    (name: string) => {
+      if (projModal?.mode === "new") {
+        flushSave();
+        const meta = createProject(name);
+        setActiveProject(meta.id);
+        setActiveProj(meta.id);
+        setProjects(listProjects());
+        setProjectVersion((v) => v + 1);
+      } else if (projModal?.mode === "rename") {
+        setProjects(renameProject(getActiveId(), name));
+      }
+      setProjModal(null);
+    },
+    [projModal, flushSave],
+  );
+
+  const removeProject = useCallback((id: string) => {
+    const remaining = deleteProject(id);
+    setProjects(remaining);
+    if (id === getActiveId() && remaining.length) {
+      setActiveProject(remaining[0].id);
+      setActiveProj(remaining[0].id);
+      setProjectVersion((v) => v + 1);
+    } else if (remaining.length === 0) {
+      // No dejar la app sin documentos.
+      const meta = createProject("Mi guion");
+      setActiveProject(meta.id);
+      setActiveProj(meta.id);
+      setProjects(listProjects());
+      setProjectVersion((v) => v + 1);
+    }
   }, []);
 
   const openPreview = useCallback(() => {
@@ -308,31 +382,15 @@ export function Workspace() {
     downloadText("guion.fountain", blocksToFountain(currentBlocks()), "text/plain");
   }, [currentBlocks]);
 
+  // Resalta la selección (o el bloque actual) con el color elegido.
   const pickRevision = useCallback((id: string) => {
-    const view = viewRef.current;
-    if (!view) return;
-    setRevEnabled(true);
     setRevId(id);
-    setRevisionMeta(view, { enabled: true, revId: id });
-    // Marca de inmediato lo que esté seleccionado (o el bloque del cursor).
-    applyRevision(id)(view.state, view.dispatch);
-    view.focus();
-  }, []);
-
-  const disableRevision = useCallback(() => {
-    const view = viewRef.current;
-    if (!view) return;
-    setRevEnabled(false);
-    setRevisionMeta(view, { enabled: false });
-    view.focus();
-  }, []);
+    run(highlightSelection(id));
+  }, [run]);
 
   const clearAllRevisions = useCallback(() => {
-    const view = viewRef.current;
-    if (!view) return;
-    clearRevisions(view.state, view.dispatch);
-    view.focus();
-  }, []);
+    run(clearHighlightSelection);
+  }, [run]);
 
   const saveTitle = useCallback((tp: TitlePage) => {
     setTitlePage(tp);
@@ -510,10 +568,8 @@ export function Workspace() {
         onImportFountain={importFountain}
         onExportFdx={exportFdx}
         onExportFountain={exportFountain}
-        revEnabled={revEnabled}
         revId={revId}
         onPickRevision={pickRevision}
-        onDisableRevision={disableRevision}
         onClearRevisions={clearAllRevisions}
         navOpen={showNav}
         onToggleNav={() => setShowNav((v) => !v)}
@@ -534,9 +590,19 @@ export function Workspace() {
         onAnalysis={() => setShowAnalysis(true)}
         onConceptBoard={() => setShowConcept(true)}
         onDirection={openDirection}
+        onBeatTimeline={() => setShowBeatTl(true)}
         onDevelopment={() => setShowDev(true)}
         onAddNote={createNote}
         onDialogueExt={addDialogueExt}
+        projects={projects}
+        activeProject={activeProj}
+        onOpenProject={switchProject}
+        onNewProject={() => setProjModal({ mode: "new", name: "" })}
+        onRenameProject={() => {
+          const p = projects.find((x) => x.id === activeProj);
+          setProjModal({ mode: "rename", name: p?.name ?? "" });
+        }}
+        onDeleteProject={() => removeProject(activeProj)}
       />
 
       <div className="editor-area">
@@ -656,11 +722,22 @@ export function Workspace() {
 
       {showConcept && <ConceptBoard onClose={() => setShowConcept(false)} />}
 
+      {showBeatTl && <BeatTimeline onClose={() => setShowBeatTl(false)} />}
+
       {dirScenes && (
         <Direction scenes={dirScenes} onJump={goToScene} onClose={() => setDirScenes(null)} />
       )}
 
       {showDev && <DevelopmentModal onClose={() => setShowDev(false)} />}
+
+      {projModal && (
+        <ProjectModal
+          mode={projModal.mode}
+          initialName={projModal.name}
+          onConfirm={confirmProjectModal}
+          onClose={() => setProjModal(null)}
+        />
+      )}
 
       {openNote && (
         <NoteEditor

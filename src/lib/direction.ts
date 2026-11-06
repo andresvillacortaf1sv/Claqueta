@@ -4,6 +4,7 @@
  * localmente.
  */
 
+import { pkey } from "./projects";
 export const DEPARTMENTS = [
   { id: "direccion", label: "Dirección" },
   { id: "arte", label: "Arte" },
@@ -20,12 +21,11 @@ export const DEPARTMENTS = [
 
 export type DeptId = string;
 
-const DEPTS_KEY = "claqueta:departamentos";
 
 /** Departamentos personalizados que el usuario añadió. */
 export function loadCustomDepartments(): { id: string; label: string }[] {
   try {
-    const v = JSON.parse(localStorage.getItem(DEPTS_KEY) || "[]");
+    const v = JSON.parse(localStorage.getItem(pkey("departamentos")) || "[]");
     return Array.isArray(v) ? v : [];
   } catch {
     return [];
@@ -40,7 +40,7 @@ export function addCustomDepartment(label: string): { id: string; label: string 
   if (!list.some((d) => d.id === id) && !DEPARTMENTS.some((d) => d.id === id)) {
     list.push({ id, label: name });
     try {
-      localStorage.setItem(DEPTS_KEY, JSON.stringify(list));
+      localStorage.setItem(pkey("departamentos"), JSON.stringify(list));
     } catch {
       /* no disponible */
     }
@@ -51,7 +51,7 @@ export function addCustomDepartment(label: string): { id: string; label: string 
 export function removeCustomDepartment(id: string): { id: string; label: string }[] {
   const list = loadCustomDepartments().filter((d) => d.id !== id);
   try {
-    localStorage.setItem(DEPTS_KEY, JSON.stringify(list));
+    localStorage.setItem(pkey("departamentos"), JSON.stringify(list));
   } catch {
     /* no disponible */
   }
@@ -101,13 +101,12 @@ export interface DirectionScene {
 
 export type DirectionData = Record<string, DirectionScene>;
 
-const KEY = "claqueta:direccion";
 
 export const STATUS_OPTIONS = ["Sin empezar", "En progreso", "Listo"];
 
 export function loadDirection(): DirectionData {
   try {
-    return JSON.parse(localStorage.getItem(KEY) || "{}");
+    return JSON.parse(localStorage.getItem(pkey("direccion")) || "{}");
   } catch {
     return {};
   }
@@ -115,7 +114,7 @@ export function loadDirection(): DirectionData {
 
 export function saveDirection(data: DirectionData): void {
   try {
-    localStorage.setItem(KEY, JSON.stringify(data));
+    localStorage.setItem(pkey("direccion"), JSON.stringify(data));
   } catch {
     /* almacenamiento lleno (p. ej. storyboards grandes) */
   }

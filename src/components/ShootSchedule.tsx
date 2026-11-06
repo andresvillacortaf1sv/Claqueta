@@ -120,7 +120,12 @@ export function ShootSchedule({ scenes, onClose, embedded }: Props) {
               key={i}
               className="sch-scene-card"
               draggable
-              onDragStart={() => setDragScene(i)}
+              onDragStart={(e) => {
+                setDragScene(i);
+                // Necesario para que el arrastre funcione en el webview de escritorio.
+                e.dataTransfer.setData("text/plain", String(i));
+                e.dataTransfer.effectAllowed = "move";
+              }}
               onDragEnd={() => setDragScene(null)}
             >
               <span className="sch-scene-num">{i}</span>
@@ -240,6 +245,8 @@ function Stripe({
       draggable
       onDragStart={(e) => {
         e.stopPropagation();
+        e.dataTransfer.setData("text/plain", strip.id);
+        e.dataTransfer.effectAllowed = "move";
         onDragStart();
       }}
       onDragOver={(e) => {
