@@ -30,7 +30,7 @@ function changeBlockKeepingText(regexp: RegExp, nodeType: NodeType): InputRule {
 }
 
 const sceneHeadingRule = changeBlockKeepingText(
-  /^(int|ext|int\/ext|int\.\/ext|i\/e|est|interior|exterior)[.\s]$/i,
+  /^(int\.?\/ext\.?|ext\.?\/int\.?|i\/e|e\/i|int|ext|est|interior|exterior)[.\s]$/i,
   nodeTypeFor("scene_heading"),
 );
 

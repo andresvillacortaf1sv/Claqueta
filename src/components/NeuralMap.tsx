@@ -8,8 +8,8 @@ interface Props {
   onClose: () => void;
 }
 
-const W = 1000;
-const H = 700;
+const W = 1500;
+const H = 980;
 
 const TYPE_META: Record<NodeType, { label: string; color: string }> = {
   scene: { label: "Escenas", color: "#c8803a" },
@@ -42,7 +42,7 @@ export function NeuralMap({ graph, onJump, onClose }: Props) {
 
   // Layout del grafo COMPLETO (estable al ocultar capas)
   const layout = useMemo(
-    () => layoutGraph(graph.nodes, graph.links, { width: W, height: H, seed }),
+    () => layoutGraph(graph.nodes, graph.links, { width: W, height: H, seed, separation: 1.7, iterations: 500 }),
     [graph, seed],
   );
   const posRef = useRef<Map<string, { x: number; y: number }>>(layout);
@@ -201,9 +201,9 @@ export function NeuralMap({ graph, onJump, onClose }: Props) {
                     }
                   }}
                 />
-                {labels && (
-                  <text x={p.x} y={p.y - r - 3} textAnchor="middle" className="nm-label">
-                    {n.label.length > 22 ? n.label.slice(0, 21) + "…" : n.label}
+                {labels && (n.type !== "object" || hit) && (
+                  <text x={p.x} y={p.y - r - 4} textAnchor="middle" className={"nm-label nm-label-" + n.type}>
+                    {n.label.length > 24 ? n.label.slice(0, 23) + "…" : n.label}
                   </text>
                 )}
               </g>

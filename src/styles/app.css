@@ -1605,7 +1605,22 @@ a:focus-visible {
 }
 .nm-svg:active { cursor: grabbing; }
 .nm-node { cursor: pointer; }
-.nm-label { fill: #cfc9bf; font-family: var(--ui-font); font-size: 11px; pointer-events: none; }
+/* Halo oscuro alrededor del texto (paint-order) para leer los rótulos sobre las líneas */
+.nm-label {
+  fill: #f0ece4;
+  font-family: var(--ui-font);
+  font-size: 12.5px;
+  font-weight: 500;
+  pointer-events: none;
+  stroke: #121110;
+  stroke-width: 3.5px;
+  paint-order: stroke;
+  stroke-linejoin: round;
+}
+.nm-label-scene { fill: #f2d8bd; }
+.nm-label-character { fill: #f6c9e0; }
+.nm-label-place { fill: #c6ecd3; }
+.nm-label-object { fill: #efe2b8; }
 .nm-zoom { position: absolute; right: 14px; bottom: 48px; display: flex; flex-direction: column; gap: 4px; }
 .nm-zoom button {
   width: 30px; height: 30px; border-radius: 6px;

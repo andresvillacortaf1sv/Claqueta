@@ -8,7 +8,7 @@ export interface SceneLocation {
   time: string; // DÍA / NOCHE / etc.
 }
 
-const IE_RE = /^(int\.?\/ext\.?|int\.?|ext\.?|est\.?|i\/e)\s*/i;
+const IE_RE = /^(int\.?\/ext\.?|ext\.?\/int\.?|i\/e|e\/i|int\.?|ext\.?|est\.?)\s*/i;
 
 export function parseHeading(heading: string): SceneLocation {
   const raw = heading.trim();

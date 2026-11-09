@@ -250,13 +250,13 @@ function Stripe({
         onDragStart();
       }}
       onDragOver={(e) => {
+        // No detenemos la propagación: si se arrastra una ESCENA nueva (no una
+        // tira), el evento debe llegar al día para añadirla.
         e.preventDefault();
-        e.stopPropagation();
         onDragOver();
       }}
       onDrop={(e) => {
         e.preventDefault();
-        e.stopPropagation();
         onDrop();
       }}
       onDragEnd={onDragEnd}
