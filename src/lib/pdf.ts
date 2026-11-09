@@ -10,6 +10,7 @@ import { jsPDF } from "jspdf";
 import { paginate, METRICS, LINES_PER_PAGE } from "./layout";
 import { Block } from "./serialize";
 import { TitlePage, hasTitlePage } from "./titlepage";
+import { savePdf } from "./save";
 import { revisionById } from "./revisions";
 
 const PAGE_W = 612; // 8.5"
@@ -102,5 +103,5 @@ export function exportarPDF(blocks: Block[], titlePage?: TitlePage, titulo = "gu
     });
   });
 
-  doc.save(`${titulo}.pdf`);
+  savePdf(doc, `${titulo}.pdf`);
 }

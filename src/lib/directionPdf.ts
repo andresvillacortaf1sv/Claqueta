@@ -3,6 +3,7 @@
  * plan de rodaje. Generados en el navegador con jsPDF (carga diferida).
  */
 import { jsPDF } from "jspdf";
+import { savePdf } from "./save";
 import { SceneBreakdown } from "./breakdown";
 import { DirectionData, getScene, allDepartments } from "./direction";
 import { Schedule } from "./schedule";
@@ -100,7 +101,7 @@ export function exportBreakdownPDF(scenes: SceneBreakdown[], data: DirectionData
     c.y += 8;
   });
 
-  doc.save("desglose-tecnico.pdf");
+  savePdf(doc, "desglose-tecnico.pdf");
 }
 
 /* ---------- Lista de planos ---------- */
@@ -162,7 +163,7 @@ export function exportShotListPDF(scenes: SceneBreakdown[], data: DirectionData)
     c.y += 10;
   });
 
-  doc.save("lista-de-planos.pdf");
+  savePdf(doc, "lista-de-planos.pdf");
 }
 
 /* ---------- Plan de rodaje ---------- */
@@ -218,5 +219,5 @@ export function exportSchedulePDF(scenes: SceneBreakdown[], schedule: Schedule):
     c.y += 12;
   });
 
-  doc.save("plan-de-rodaje.pdf");
+  savePdf(doc, "plan-de-rodaje.pdf");
 }

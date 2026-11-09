@@ -365,21 +365,27 @@ export function Workspace() {
   }, []);
 
   const importFdx = useCallback(async () => {
-    const file = await pickTextFile(".fdx,application/xml,text/xml");
+    const file = await pickTextFile(".fdx,application/xml,text/xml", [{ name: "Final Draft", extensions: ["fdx"] }]);
     if (file) replaceWithBlocks(fdxToBlocks(file.text));
   }, [replaceWithBlocks]);
 
   const importFountain = useCallback(async () => {
-    const file = await pickTextFile(".fountain,.txt,text/plain");
+    const file = await pickTextFile(".fountain,.txt,text/plain", [
+      { name: "Fountain", extensions: ["fountain", "txt"] },
+    ]);
     if (file) replaceWithBlocks(fountainToBlocks(file.text));
   }, [replaceWithBlocks]);
 
   const exportFdx = useCallback(() => {
-    downloadText("guion.fdx", blocksToFdx(currentBlocks()), "application/xml");
+    downloadText("guion.fdx", blocksToFdx(currentBlocks()), "application/xml", [
+      { name: "Final Draft", extensions: ["fdx"] },
+    ]);
   }, [currentBlocks]);
 
   const exportFountain = useCallback(() => {
-    downloadText("guion.fountain", blocksToFountain(currentBlocks()), "text/plain");
+    downloadText("guion.fountain", blocksToFountain(currentBlocks()), "text/plain", [
+      { name: "Fountain", extensions: ["fountain"] },
+    ]);
   }, [currentBlocks]);
 
   // Resalta la selección (o el bloque actual) con el color elegido.
@@ -524,7 +530,7 @@ export function Workspace() {
     setBdData((prev) => setBreakdownField(prev, key, cat, value));
   }, []);
   const exportCsv = useCallback((filename: string, csv: string) => {
-    downloadText(filename, "﻿" + csv, "text/csv");
+    downloadText(filename, "﻿" + csv, "text/csv", [{ name: "CSV", extensions: ["csv"] }]);
   }, []);
 
   const openNeural = useCallback(() => {
