@@ -68,6 +68,22 @@ export function AISettings({ initial, onSave, onClose }: Props) {
           </label>
         )}
 
+        <label className="field">
+          <span>Base de conocimiento / criterios de análisis (opcional)</span>
+          <textarea
+            rows={6}
+            value={cfg.knowledge ?? ""}
+            onChange={(e) => setCfg((c) => ({ ...c, knowledge: e.target.value }))}
+            placeholder={
+              "Pega aquí tus apuntes, el modelo de estructura que enseñas, preguntas que la IA debe considerar, reglas de tu escuela, etc.\n\nEj.: «Analiza según la estructura de 8 secuencias. Señala si el detonante llega antes del minuto 12. Evalúa si cada escena cambia un valor dramático…»"
+            }
+          />
+          <small className="ai-hint">
+            Lo que escribas aquí se usa como base en cada análisis. No pegues libros completos
+            (no caben y son con derechos): resume sus marcos, o pega tus propios materiales.
+          </small>
+        </label>
+
         <div className="modal-actions">
           <button className="btn-ghost" onClick={onClose}>
             Cancelar

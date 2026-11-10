@@ -325,6 +325,8 @@ body {
 }
 .modal {
   width: min(92vw, 460px);
+  max-height: 88vh;
+  overflow-y: auto;
   background: var(--panel-2);
   border: 1px solid var(--bar-line);
   border-radius: var(--radius-lg);

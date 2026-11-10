@@ -18,6 +18,7 @@ export interface AIConfig {
   apiKey: string;
   model: string;
   workspaceId?: string; // sólo Anthropic: para claves con ámbito de organización
+  knowledge?: string; // base de conocimiento / criterios del usuario para el análisis
 }
 
 const KEY = "claqueta:ia";
@@ -72,13 +73,34 @@ function scenesText(blocks: Block[]): string {
   return lines.join("\n");
 }
 
-const SYSTEM = `Eres un analista de guion cinematográfico. Analiza el guion completo y responde ÚNICAMENTE con un JSON válido (sin texto alrededor, sin markdown) con esta forma exacta:
+const SYSTEM_BASE = `Eres un analista de guion cinematográfico con formación en teoría narrativa. Analizas aplicando los marcos clásicos de estructura y personaje:
+- Estructura en tres actos y el paradigma de Syd Field (planteamiento, confrontación, resolución; detonante ~10-15%, puntos de giro, punto medio, clímax).
+- Los beats de la estructura (estilo "Save the Cat" de Blake Snyder): detonante, debate, ruptura hacia el segundo acto, punto medio, "todo está perdido", noche oscura del alma, clímax y cierre.
+- Viaje del héroe (Campbell/Vogler) cuando aplique.
+- Principios de Robert McKee (Story= valor en cambio por escena, conflicto, giro de valores, brecha entre expectativa y resultado).
+- Arco de personaje: deseo vs. necesidad, mentira que el personaje cree, herida, transformación.
+- Tema, premisa y tono.
+
+Evalúa ritmo, causalidad, tensión, claridad de objetivos y coherencia del arco. Sé concreto y útil para un guionista.
+
+Responde ÚNICAMENTE con un JSON válido (sin texto alrededor, sin markdown) con esta forma exacta:
 {
-  "resumen": "string, 3-5 frases sobre el arco dramático",
+  "resumen": "string, 4-6 frases: premisa, arco dramático, fortalezas y el principal problema estructural a resolver",
   "escenas": [ { "indice": 0, "emocion": "string corta", "color": "#rrggbb", "intensidad": 0-100, "atencion": 0-100, "tension": 0-100 } ],
   "estructura": [ { "etapa": "Setup|Detonante|Desarrollo|Giro|Clímax|Desenlace", "desde": 0, "hasta": 0 } ]
 }
 Incluye una entrada en "escenas" por cada [ESCENA n] del guion, con su mismo índice. El color debe representar la emoción dominante.`;
+
+/** Construye el prompt de sistema, añadiendo el marco/criterios del usuario si los hay. */
+function buildSystem(knowledge?: string): string {
+  const extra = (knowledge ?? "").trim();
+  if (!extra) return SYSTEM_BASE;
+  return (
+    SYSTEM_BASE +
+    `\n\n--- MARCO Y CRITERIOS DEL USUARIO (tienen prioridad; úsalos como base del análisis) ---\n` +
+    extra
+  );
+}
 
 export function extractJson(text: string): any {
   let t = text.trim();
@@ -90,7 +112,7 @@ export function extractJson(text: string): any {
   return JSON.parse(t.slice(start, end + 1));
 }
 
-async function callAnthropic(cfg: AIConfig, user: string): Promise<string> {
+async function callAnthropic(cfg: AIConfig, user: string, system: string): Promise<string> {
   const headers: Record<string, string> = {
     "content-type": "application/json",
     "x-api-key": cfg.apiKey,
@@ -104,7 +126,7 @@ async function callAnthropic(cfg: AIConfig, user: string): Promise<string> {
     body: JSON.stringify({
       model: cfg.model,
       max_tokens: 4000,
-      system: SYSTEM,
+      system,
       messages: [{ role: "user", content: user }],
     }),
   });
@@ -113,7 +135,7 @@ async function callAnthropic(cfg: AIConfig, user: string): Promise<string> {
   return data.content?.[0]?.text ?? "";
 }
 
-async function callOpenAICompatible(cfg: AIConfig, user: string): Promise<string> {
+async function callOpenAICompatible(cfg: AIConfig, user: string, system: string): Promise<string> {
   const headers: Record<string, string> = { "content-type": "application/json" };
   if (cfg.apiKey) headers["authorization"] = `Bearer ${cfg.apiKey}`;
   const res = await fetch(`${cfg.baseURL.replace(/\/$/, "")}/chat/completions`, {
@@ -122,7 +144,7 @@ async function callOpenAICompatible(cfg: AIConfig, user: string): Promise<string
     body: JSON.stringify({
       model: cfg.model,
       messages: [
-        { role: "system", content: SYSTEM },
+        { role: "system", content: system },
         { role: "user", content: user },
       ],
       temperature: 0.4,
@@ -136,7 +158,8 @@ async function callOpenAICompatible(cfg: AIConfig, user: string): Promise<string
 export async function analyzeWithAI(blocks: Block[], cfg: AIConfig): Promise<Analysis> {
   const base = heuristicAnalysis(blocks);
   const user = `Analiza este guion:\n${scenesText(blocks)}`;
-  const raw = cfg.provider === "anthropic" ? await callAnthropic(cfg, user) : await callOpenAICompatible(cfg, user);
+  const system = buildSystem(cfg.knowledge);
+  const raw = cfg.provider === "anthropic" ? await callAnthropic(cfg, user, system) : await callOpenAICompatible(cfg, user, system);
   const json = extractJson(raw);
 
   const byIndex = new Map<number, any>();
