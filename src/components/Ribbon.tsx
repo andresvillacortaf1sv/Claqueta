@@ -25,6 +25,8 @@ interface Props {
   onImportFountain: () => void;
   onExportFdx: () => void;
   onExportFountain: () => void;
+  onSaveProjectFile: () => void;
+  onOpenProjectFile: () => void;
   revId: string;
   onPickRevision: (id: string) => void;
   onClearRevisions: () => void;
@@ -233,15 +235,23 @@ export function Ribbon(props: Props) {
               </button>
             </Group>
 
-            <Group label="Documento">
-              <button className="rb-btn" onClick={props.onDevelopment} title="Logline, tagline, sinopsis y tratamiento">
-                Desarrollo
+            <Group label="Archivo">
+              <button
+                className="rb-btn rb-btn-primary"
+                onClick={props.onSaveProjectFile}
+                title="Guardar el proyecto completo en un archivo .claqueta de tu PC (Ctrl/Cmd+S)"
+              >
+                💾 Guardar
               </button>
-              <button className="rb-btn" onClick={props.onPortada} title="Página de título">
-                Portada
+              <button
+                className="rb-btn"
+                onClick={props.onOpenProjectFile}
+                title="Abrir un archivo .claqueta guardado"
+              >
+                📂 Abrir
               </button>
               <Menu
-                label="Archivo"
+                label="Importar / Exportar"
                 items={[
                   { label: "Importar FDX…", onClick: props.onImportFdx },
                   { label: "Importar Fountain…", onClick: props.onImportFountain },
@@ -249,6 +259,15 @@ export function Ribbon(props: Props) {
                   { label: "Exportar Fountain", onClick: props.onExportFountain },
                 ]}
               />
+            </Group>
+
+            <Group label="Documento">
+              <button className="rb-btn" onClick={props.onDevelopment} title="Logline, tagline, sinopsis y tratamiento">
+                Desarrollo
+              </button>
+              <button className="rb-btn" onClick={props.onPortada} title="Página de título">
+                Portada
+              </button>
               <button className="rb-btn rb-btn-primary" onClick={props.onPreview}>
                 Páginas / PDF
               </button>

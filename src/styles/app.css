@@ -208,6 +208,28 @@ body {
   font-size: 0.78rem;
 }
 
+/* Aviso flotante al guardar/abrir un archivo de proyecto. */
+.save-toast {
+  position: fixed;
+  bottom: 2.6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 950;
+  background: #1f7a3d;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  animation: toast-in 0.18s ease-out;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translate(-50%, 6px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
 .status-left {
   display: flex;
   align-items: center;

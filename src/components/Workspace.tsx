@@ -24,6 +24,8 @@ import {
   ProjectMeta,
 } from "../lib/projects";
 import { ProjectModal } from "./ProjectModal";
+import { exportProjectPack, suggestFileName, importProjectPackAsNew } from "../lib/projectPack";
+import { saveText, openTextFile } from "../lib/save";
 import { cargarDocumento, guardarDocumento, docFromBlocks } from "../editor/document";
 import { setElement, appendCharacterExtension } from "../editor/commands";
 import { downloadText, pickTextFile } from "../lib/files";
@@ -84,6 +86,7 @@ export function Workspace() {
   const [current, setCurrent] = useState<ElementType>("action");
   const [emptyLine, setEmptyLine] = useState(false);
   const [save, setSave] = useState<SaveState>("guardado");
+  const [savedMsg, setSavedMsg] = useState<string | null>(null);
   const [previewBlocks, setPreviewBlocks] = useState<Block[] | null>(null);
   const [titlePage, setTitlePage] = useState<TitlePage>(() => loadTitlePage());
   const [showTitleModal, setShowTitleModal] = useState(false);
@@ -185,7 +188,13 @@ export function Workspace() {
     requestAnimationFrame(() => recomputeRef.current());
 
     return () => {
-      if (saveTimer.current) window.clearTimeout(saveTimer.current);
+      // Volcar cualquier guardado pendiente antes de destruir el editor
+      // (si se cierra o cambia de documento dentro del medio segundo de espera).
+      if (saveTimer.current) {
+        window.clearTimeout(saveTimer.current);
+        guardarDocumento(view.state.doc);
+        touchProject(getActiveId());
+      }
       view.destroy();
       viewRef.current = null;
     };
@@ -297,6 +306,59 @@ export function Workspace() {
       touchProject(getActiveId());
     }
   }, []);
+
+  // Guardar al ocultar o cerrar la ventana, para no perder lo último escrito.
+  useEffect(() => {
+    const onHide = () => flushSave();
+    window.addEventListener("pagehide", onHide);
+    window.addEventListener("beforeunload", onHide);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") flushSave();
+    });
+    return () => {
+      window.removeEventListener("pagehide", onHide);
+      window.removeEventListener("beforeunload", onHide);
+    };
+  }, [flushSave]);
+
+  // Guardar el proyecto completo a un archivo .claqueta en el disco.
+  const saveProjectFile = useCallback(async () => {
+    flushSave();
+    setSave("guardando");
+    try {
+      const ok = await saveText(suggestFileName(), exportProjectPack(), "application/json", [
+        { name: "Proyecto Claqueta", extensions: ["claqueta"] },
+      ]);
+      if (ok) {
+        setSavedMsg("Proyecto guardado en archivo ✓");
+        window.setTimeout(() => setSavedMsg(null), 2500);
+      }
+    } catch (e) {
+      window.alert("No se pudo guardar el archivo: " + (e instanceof Error ? e.message : String(e)));
+    } finally {
+      setSave("guardado");
+    }
+  }, [flushSave]);
+
+  // Abrir un archivo .claqueta como proyecto nuevo.
+  const openProjectFile = useCallback(async () => {
+    const file = await openTextFile(".claqueta,application/json", [
+      { name: "Proyecto Claqueta", extensions: ["claqueta", "json"] },
+    ]);
+    if (!file) return;
+    try {
+      flushSave();
+      const meta = importProjectPackAsNew(file.text);
+      setActiveProject(meta.id);
+      setActiveProj(meta.id);
+      setProjects(listProjects());
+      setProjectVersion((v) => v + 1);
+      setSavedMsg(`Abierto: ${meta.name} ✓`);
+      window.setTimeout(() => setSavedMsg(null), 2500);
+    } catch (e) {
+      window.alert("No se pudo abrir el proyecto: " + (e instanceof Error ? e.message : String(e)));
+    }
+  }, [flushSave]);
 
   const switchProject = useCallback(
     (id: string) => {
@@ -549,6 +611,12 @@ export function Workspace() {
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (!(e.metaKey || e.ctrlKey)) return;
+      // Ctrl/Cmd+S: guardar el proyecto a archivo.
+      if ((e.key === "s" || e.key === "S") && !e.shiftKey) {
+        e.preventDefault();
+        saveProjectFile();
+        return;
+      }
       const n = Number(e.key);
       if (Number.isNaN(n) || n < 1 || n > TAB_CYCLE.length) return;
       e.preventDefault();
@@ -556,7 +624,7 @@ export function Workspace() {
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [applyElement]);
+  }, [applyElement, saveProjectFile]);
 
   return (
     <div className={"workspace" + (night ? " night" : "")}>
@@ -574,6 +642,8 @@ export function Workspace() {
         onImportFountain={importFountain}
         onExportFdx={exportFdx}
         onExportFountain={exportFountain}
+        onSaveProjectFile={saveProjectFile}
+        onOpenProjectFile={openProjectFile}
         revId={revId}
         onPickRevision={pickRevision}
         onClearRevisions={clearAllRevisions}
@@ -631,6 +701,8 @@ export function Workspace() {
         empty={emptyLine}
         save={save}
       />
+
+      {savedMsg && <div className="save-toast">{savedMsg}</div>}
 
       {previewBlocks && (
         <Preview
